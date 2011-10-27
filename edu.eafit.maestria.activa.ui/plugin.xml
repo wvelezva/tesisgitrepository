@@ -58,11 +58,10 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="%view.name"
-            allowMultiple="true"
-            icon="icons/sample2.gif"
-            class="edu.eafit.maestria.activa.ui.View"
-            id="activa.ui.view">
+            name="%view.player.name"
+            allowMultiple="false"
+            class="edu.eafit.maestria.activa.ui.player.Player"
+            id="activa.ui.view.player">
       </view>
       <view
             name="Mailboxes"
@@ -533,6 +532,48 @@
                tooltip="%command.detect.track.particle">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:activa.ui.view.player">
+        <command
+              commandId="activa.ui.command.player.select"
+              icon="icons/16/select-icon 16.png"
+              label="%command.player.select"
+              style="push"
+              tooltip="%command.player.select">
+        </command>
+        <command
+              commandId="activa.ui.command.player.drawRectangle"
+              icon="icons/16/shape-square-icon 16.png"
+              label="%command.player.drawRectangle"
+              style="push"
+              tooltip="%command.player.drawRectangle">
+         </command>
+         <command
+              commandId="activa.ui.command.player.drawPolygon"
+              icon="icons/16/draw-polygon-icon 16.png"
+              label="%command.player.drawPolygon"
+              style="push"
+              tooltip="%command.player.drawPolygon">
+         </command>
+         <command
+              commandId="activa.ui.command.player.selectWand"
+              icon="icons/16/wand-icon 16.png"
+              label="%command.player.selectWand"
+              style="push"
+              tooltip="%command.player.selectWand">
+         </command>
+         <separator
+               name="activa.ui.separator8">
+         </separator>
+         <command
+              commandId="activa.ui.command.player.play"
+              icon="icons/16/Button Play-01 16.png"
+              label="%command.player.play"
+              style="push"
+              tooltip="%command.player.play">
+         </command>
+      </menuContribution>
       
       
       
@@ -856,7 +897,53 @@
             id="activa.ui.command.ddlRunGenerate"
             name="ddlRunGenerate">
       </command>
+       <!-- Player Category -->
+      <category
+            id="activa.ui.category.player"
+            name="%command.player">
+      </category>
+      <command
+      		categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            id="activa.ui.command.player.drawRectangle"
+            name="%command.player.drawRectangle">
+      </command>
+      <command
+      		categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            id="activa.ui.command.player.drawPolygon"
+            name="%command.player.drawPolygon">
+      </command>
+      <command
+      		categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            id="activa.ui.command.player.select"
+            name="%command.player.select">
+      </command>
+      <command
+      		categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            id="activa.ui.command.player.selectWand"
+            name="%command.player.selectWand">
+      </command>
+      <command
+            categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.PlayHandler"
+            id="activa.ui.command.player.play"
+            name="%command.player.play">
+      </command>
    </extension>
+   
+    <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            name="name of context"
+            description="description context"
+            id="activa.context"
+            parentid="org.eclipse.ui.contexts.window">
+      </context>
+   </extension>
+   
    <extension
          point="org.eclipse.ui.bindings">
       <scheme
@@ -867,7 +954,8 @@
       <key
             commandId="activa.ui.command.file.new"
             schemeId="activa.ui.key.scheme"
-            sequence="M1+N">
+            sequence="M1+N"
+            contextId="activa.context">
       </key>
       <key
             commandId="activa.ui.command.file.open"
@@ -886,7 +974,7 @@
       </key>
       <key
             commandId="org.eclipse.ui.file.exit"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            schemeId="activa.ui.key.scheme"
             sequence="M1+Q">
       </key>
 	<!-- Edit commands - keys -->
@@ -1079,6 +1167,35 @@
             sequence="M1+?">
       </key>
       
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="edu.eafit.maestria.activa.ui.preferences.GeneralPage"
+            id="activa.ui.preferences.general"
+            name="%preferences.general">
+            <keywordReference id="activa.keywords.general"/>
+      </page>
+      <!--page
+			category="org.eclipse.ui.preferencePages.Workbench"
+			id="org.eclipse.ui.preferencePages.NewKeys"
+			class="org.eclipse.ui.ExtensionFactory:newKeysPreferencePage "
+			name="Keys (Experimental)">
+			<keywordReference id="org.eclipse.ui.ide.keys"/>
+	  </page-->
+   </extension>
+   
+   <extension point="org.eclipse.ui.keywords">
+		<keyword 
+			id="activa.keywords.general" 
+			label="%activa.keywords.general">
+		</keyword>
+	</extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.eafit.maestria.activa.ui.preferences.Initializer">
+      </initializer>
    </extension>
 
 </plugin>

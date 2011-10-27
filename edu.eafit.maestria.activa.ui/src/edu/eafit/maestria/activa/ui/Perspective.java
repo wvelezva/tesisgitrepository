@@ -3,6 +3,11 @@ package edu.eafit.maestria.activa.ui;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.IViewLayout;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
+
+import edu.eafit.maestria.activa.ui.player.Player;
 
 public class Perspective implements IPerspectiveFactory {
 
@@ -12,14 +17,31 @@ public class Perspective implements IPerspectiveFactory {
 	public static final String ID = "activa.ui.perspective";
 
 	public void createInitialLayout(IPageLayout layout) {
+//		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+//			   public void run() {
+//			    ((IContextService) PlatformUI.getWorkbench()
+//			     .getService(IContextService.class))
+//			      .activateContext("activa.context");
+//			   }
+//			});
+		
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
+
+		IFolderLayout folder = layout.createFolder("messages", IPageLayout.TOP, 0.75f, editorArea);
+		folder.addPlaceholder(Player.ID + ":*");
+		folder.addView(Player.ID);
 		
-		layout.addStandaloneView(NavigationView.ID,  false, IPageLayout.LEFT, 0.25f, editorArea);
-		IFolderLayout folder = layout.createFolder("messages", IPageLayout.TOP, 0.5f, editorArea);
-		folder.addPlaceholder(View.ID + ":*");
-		folder.addView(View.ID);
+		IFolderLayout scenes = layout.createFolder("scenes", IPageLayout.TOP, 0.25f, editorArea);
+		scenes.addPlaceholder(NavigationView.ID+ ":*");
+		scenes.addView(NavigationView.ID);
 		
-		layout.getViewLayout(NavigationView.ID).setCloseable(false);
+		IViewLayout viewLayout = layout.getViewLayout(Player.ID);
+		viewLayout.setCloseable(false);
+		viewLayout.setMoveable(false);
+		
+		IViewLayout navigationLayout = layout.getViewLayout(NavigationView.ID);
+		navigationLayout.setCloseable(false);
+		navigationLayout.setMoveable(false);
 	}
 }
