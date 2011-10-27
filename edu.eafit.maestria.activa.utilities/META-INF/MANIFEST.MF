@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: acTiVa Utilities
+Bundle-SymbolicName: edu.eafit.maestria.activa.utilities
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.eafit.maestria.activa.utilities.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ libs;bundle-version="1.0.0"
+Export-Package: edu.eafit.maestria.activa.utilities
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
