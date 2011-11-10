@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
-
 public class Player extends ViewPart {
 	public Player() {
 	}
@@ -25,12 +24,15 @@ public class Player extends ViewPart {
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayoutData(new RowData(600,400));
-		composite.setVisible(true);
-		VlcjPlayer.createUI(composite);
+		Composite player = new Composite(parent, SWT.NONE);
+		RowLayout playerLayout = new RowLayout(SWT.VERTICAL);
+		player.setLayout(playerLayout);
+		//player.setLayoutData(new RowData(600,600));
+		
+		VlcjPlayer.getInstance().createUI(player);
+		
 	}
-
+	
 	public void setFocus() {
 		//messageText.setFocus();
 	}

@@ -243,27 +243,27 @@
                   label="%command.view.show">
                   <command
                         commandId="activa.ui.command.view.show.allColors"
-                        icon="icons/16/color-wheel-icon 16.png"
+                        icon="icons/16/colorWheel-16.png"
                         label=" ">
 	              </command>
                   <command
                         commandId="activa.ui.command.view.show.red"
-                        icon="icons/16/Button-Blank-Red-icon 16.png"
+                        icon="icons/16/red-16.png"
                         label=" ">
                   </command>
                   <command
                         commandId="activa.ui.command.view.show.green"
-                        icon="icons/16/Button-Blank-Green-icon 16.png"
+                        icon="icons/16/green-16.png"
                         label=" ">
 	              </command>
 	              <command
                         commandId="activa.ui.command.view.show.yellow"
-                        icon="icons/16/Button-Blank-Yellow-icon 16.png"
+                        icon="icons/16/yellow-16.png"
                         label=" ">
 	              </command>
 	              <command
                         commandId="activa.ui.command.view.show.blue"
-                        icon="icons/16/Button-Blank-Blue-icon 16.png"
+                        icon="icons/16/blue-16.png"
                         label=" ">
 	              </command>
             </menu>
@@ -369,7 +369,7 @@
             </command>
             <command
                   commandId="activa.ui.command.file.close"
-                  icon="icons/48/Button Close-01 48.png"
+                  icon="icons/48/close-48.png"
                   label="%command.file.close"
                   style="push"
                   tooltip="%command.file.close">
@@ -386,7 +386,7 @@
                id="preferencesToolbar">
             <command
                   commandId="org.eclipse.ui.window.preferences"
-                  icon="icons/48/Sidebar-Utilities-icon 48.png"
+                  icon="icons/48/preferences-48.png"
                   label="%command.preferences"
                   style="push"
                   tooltip="%command.preferences">
@@ -430,7 +430,7 @@
             </command>
             <command
                   commandId="activa.ui.command.ddlRunGenerate"
-                  icon="icons/48/Button Refresh-01 48.png"
+                  icon="icons/48/transcode-48.png"
                   label="%command.run.generate"
                   style="pulldown"
                   tooltip="%command.run.generate">
@@ -442,27 +442,27 @@
             locationURI="menu:activa.ui.command.ddlView">
           <command
                 commandId="activa.ui.command.view.show.allColors"
-                icon="icons/16/color-wheel-icon 16.png"
+                icon="icons/16/colorWheel-16.png"
                 label=" ">
           </command>
           <command
                 commandId="activa.ui.command.view.show.red"
-                icon="icons/16/Button-Blank-Red-icon 16.png"
+                icon="icons/16/red-16.png"
                 label=" ">
           </command>
           <command
                 commandId="activa.ui.command.view.show.green"
-                icon="icons/16/Button-Blank-Green-icon 16.png"
+                icon="icons/16/green-16.png"
                 label=" ">
           </command>
           <command
                 commandId="activa.ui.command.view.show.yellow"
-                icon="icons/16/Button-Blank-Yellow-icon 16.png"
+                icon="icons/16/yellow-16.png"
                 label=" ">
           </command>
           <command
                 commandId="activa.ui.command.view.show.blue"
-                icon="icons/16/Button-Blank-Blue-icon 16.png"
+                icon="icons/16/blue-16.png"
                 label=" ">
           </command>
       </menuContribution>
@@ -563,16 +563,6 @@
               style="push"
               tooltip="%command.player.selectWand">
          </command>
-         <separator
-               name="activa.ui.separator8">
-         </separator>
-         <command
-              commandId="activa.ui.command.player.play"
-              icon="icons/16/Button Play-01 16.png"
-              label="%command.player.play"
-              style="push"
-              tooltip="%command.player.play">
-         </command>
       </menuContribution>
       
       
@@ -608,6 +598,12 @@
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.file.SaveHandler"
             id="activa.ui.command.file.save"
             name="%command.file.save">
+      </command>
+      <command
+            categoryId="activa.ui.category.file"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.file.SaveDialogHandler"
+            id="activa.ui.command.file.saveDialog"
+            name="%command.file.saveDialog">
       </command>
       <command
       		categoryId="activa.ui.category.file"
@@ -925,12 +921,6 @@
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.player.selectWand"
             name="%command.player.selectWand">
-      </command>
-      <command
-            categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.PlayHandler"
-            id="activa.ui.command.player.play"
-            name="%command.player.play">
       </command>
    </extension>
    

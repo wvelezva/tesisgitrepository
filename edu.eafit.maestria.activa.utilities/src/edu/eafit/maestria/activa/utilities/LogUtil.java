@@ -78,6 +78,10 @@ public class LogUtil {
     public void logError(String message, Throwable t) {
         log(message, t, Status.ERROR, Status.OK);
     }
+    
+    public void logWarning(Throwable t) {
+        logError(t.getMessage(), t);
+    }
 
     public void logWarning(String message) {
         log(message, null, Status.WARNING, Status.OK);

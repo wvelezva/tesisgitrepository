@@ -8,7 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import edu.eafit.maestria.activa.model.converters.Convertable;
 
 @XStreamAlias("metadata")
-public class Metadata implements Convertable, Modifiable{
+public class Metadata implements Convertable{
 	private File source;
 	
 	@XStreamOmitField
@@ -27,5 +27,10 @@ public class Metadata implements Convertable, Modifiable{
 	@Override
 	public boolean isModified() {
 		return modified;
+	}
+	
+	@Override
+	public void resetModified(){
+		modified=false;
 	}
 }

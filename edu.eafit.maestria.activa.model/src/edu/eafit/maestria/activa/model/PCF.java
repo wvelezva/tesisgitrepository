@@ -2,11 +2,13 @@ package edu.eafit.maestria.activa.model;
 
 import java.io.File;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import edu.eafit.maestria.activa.model.converters.Convertable;
 
-public class PCF implements Convertable, Modifiable{
+@XStreamAlias("pcf")
+public class PCF implements Convertable{
 	private File source;
 
 	@XStreamOmitField
@@ -26,5 +28,8 @@ public class PCF implements Convertable, Modifiable{
 		return modified;
 	}
 
-	
+	@Override
+	public void resetModified(){
+		modified=false;
+	}
 }

@@ -13,7 +13,7 @@ import edu.eafit.maestria.activa.model.converters.TVAnyTimeToFileConverter;
 import edu.eafit.maestria.activa.model.converters.VideoToFileConverter;
 
 @XStreamAlias("project")
-public class Project implements Convertable, Modifiable {
+public class Project implements Convertable {
 	
 	@XStreamAsAttribute
 	private String ID;
@@ -23,10 +23,13 @@ public class Project implements Convertable, Modifiable {
 	
 	@XStreamConverter(VideoToFileConverter.class)
 	private Video video;
+	
 	@XStreamConverter(PCFToFileConverter.class)
 	private PCF pcf;
+	
 	@XStreamConverter(TVAnyTimeToFileConverter.class)
 	private TVAnyTime tva;
+	
 	@XStreamConverter(MetadataToFileConverter.class)
 	private Metadata metadata;
 	
@@ -78,10 +81,16 @@ public class Project implements Convertable, Modifiable {
 		return isModified(video) || isModified(pcf) || isModified(metadata) || isModified(tva);
 	}
 	
+	@Override
+	public void resetModified(){
+	}
+	
 	private boolean isModified(Modifiable modifiable) {
 		if (modifiable != null)
 			return modifiable.isModified();
 		return false;
 	}
+	
+	
 	
 }

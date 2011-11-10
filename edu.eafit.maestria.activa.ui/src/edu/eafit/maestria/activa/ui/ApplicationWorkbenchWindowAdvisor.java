@@ -3,6 +3,8 @@ package edu.eafit.maestria.activa.ui;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
+import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
@@ -15,6 +17,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         //configurer.setShowCoolBar(true);
         //configurer.setShowStatusLine(true);
         configurer.setShowProgressIndicator(true);
+    }
+    
+    //FIXME aca es donde se debe crear un dialogo modal al salir para preguntarle al usuario en caso de no estar salvado el proyecto
+    public boolean preWindowShellClose() {
+    	return super.preWindowShellClose();
+    }
+    
+    public void dispose() {
+    	VlcjPlayer.getInstance().release();
     }
     
 }

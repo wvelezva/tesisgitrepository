@@ -57,6 +57,7 @@ public abstract class BaseVlcj {
 	static {
 		if (StringUtils.isBlank(System.getProperty("vlcj.log"))) {
 			System.setProperty("vlcj.log", VLCJ_LOG_LEVEL);
+			System.setProperty("sun.awt.noerasebackground", "true");
 		}
 
 		if (StringUtils.isBlank(System.getProperty("jna.library.path")) && StringUtils.isNotBlank(NATIVE_LIBRARY_SEARCH_PATH)) {
@@ -69,9 +70,14 @@ public abstract class BaseVlcj {
 	    vlcArgs.add("--no-plugins-cache");
 	    vlcArgs.add("--no-video-title-show");
 	    vlcArgs.add("--no-snapshot-preview");
-	    vlcArgs.add("--quiet");
-	    vlcArgs.add("--quiet-synchro");
-	    vlcArgs.add("--intf");
+	    vlcArgs.add("--auto-preparse");
+	    if (!"DEBUG".equals(System.getProperty("vlcj.log"))) {
+		    vlcArgs.add("--quiet");
+		    vlcArgs.add("--quiet-synchro");
+	    } else {
+	    	vlcArgs.add("-vvv");
+	    }
+	    //vlcArgs.add("--intf");
 	    if (RuntimeUtil.isMac())
 	    	vlcArgs.add("--vout=macosx");
 	    vlcArgs.add("dummy");

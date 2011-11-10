@@ -1,24 +1,30 @@
 package edu.eafit.maestria.activa.ui.handlers.file;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-import edu.eafit.maestria.activa.model.Metadata;
-import edu.eafit.maestria.activa.model.PCF;
 import edu.eafit.maestria.activa.model.Project;
-import edu.eafit.maestria.activa.model.TVAnyTime;
-import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.services.IProjectServices;
 import edu.eafit.maestria.activa.services.ProjectServicesImpl;
+import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
 import edu.eafit.maestria.activa.ui.utils.Messages;
-import edu.eafit.maestria.activa.utilities.Constants;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class NewWizard extends Wizard {
 
+	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), NewWizard.class);
 	private NewWizardPage newWizardPage;
+	private ExecutionEvent event;
 	
-	public NewWizard() {
+	public NewWizard(ExecutionEvent event) {
+		super();
+		this.event = event;
 		setWindowTitle(Messages.COMMAND_FILE_NEW_WIZARD_TITLE);
 	}
 
@@ -33,34 +39,23 @@ public class NewWizard extends Wizard {
 		String projectName =  newWizardPage.getProjectName();
 		File projectDir = newWizardPage.getProjectLocation();
 		File sourceVideo = new File(newWizardPage.getSourceVideo());
-		if (projectDir.mkdirs()) {
-			File projectFile = new File(projectDir, projectName + Constants.File.PROJECT_FILE_EXTENSION);
-			
-			IProjectServices projectServices = ProjectServicesImpl.getInstance();
-			Project project = new Project();
-			project.setID(String.valueOf(System.currentTimeMillis()));
-			project.setSource(projectFile);
-			project.setName(projectName);
-			
-			Metadata metadata = new Metadata();
-			metadata.setSource(new File(projectDir, projectName + Constants.File.METADATA_FILE_EXTENSION));
-			project.setMetadata(metadata);
-			
-			PCF pcf= new PCF();
-			pcf.setSource(new File(projectDir, projectName + Constants.File.PCF_FILE_EXTENSION));
-			project.setPcf(pcf);
-			
-			TVAnyTime tva = new TVAnyTime();
-			tva.setSource(new File(projectDir, projectName + Constants.File.TVANYTIME_FILE_EXTENSION));
-			project.setTva(tva);
-			
-			Video video = new Video();
-			video.setSource(sourceVideo);
-			project.setVideo(video);
-		
-			return projectServices.saveProject(project);
+		IProjectServices projectServices = ProjectServicesImpl.getInstance();
+		Project project = projectServices.newProject(projectName, sourceVideo, projectDir);
+		if (project == null) {
+			try {
+				FileUtils.deleteDirectory(projectDir);
+			} catch (IOException e) {
+				logger.logError(e);
+			}
+			logger.logFatal(new Exception("Project cannot be null"));
+			HandlerUtil.getActiveWorkbenchWindow(event).close();
 		}
-		return false;
+		
+		VlcjPlayer.getInstance().prepareNewMedia(project.getVideo());
+		projectServices.saveProject(project);
+		UIActivator.setProject(project);
+		
+		return true;
 	}
 
 }

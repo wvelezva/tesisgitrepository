@@ -2,11 +2,13 @@ package edu.eafit.maestria.activa.model;
 
 import java.io.File;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import edu.eafit.maestria.activa.model.converters.Convertable;
 
-public class TVAnyTime implements Convertable, Modifiable{
+@XStreamAlias("tva")
+public class TVAnyTime implements Convertable{
 	
 	private File source;
 	@XStreamOmitField
@@ -24,6 +26,11 @@ public class TVAnyTime implements Convertable, Modifiable{
 	@Override
 	public boolean isModified() {
 		return modified;
+	}
+	
+	@Override
+	public void resetModified(){
+		modified=false;
 	}
 
 }
