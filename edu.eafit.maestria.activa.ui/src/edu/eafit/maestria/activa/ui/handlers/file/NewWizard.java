@@ -12,7 +12,7 @@ import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.services.IProjectServices;
 import edu.eafit.maestria.activa.services.ProjectServicesImpl;
 import edu.eafit.maestria.activa.ui.UIActivator;
-import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.ui.utils.Messages;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
@@ -51,7 +51,7 @@ public class NewWizard extends Wizard {
 			HandlerUtil.getActiveWorkbenchWindow(event).close();
 		}
 		
-		VlcjPlayer.getInstance().prepareNewMedia(project.getVideo());
+		ActivaPlayer.getInstance().prepareNewMedia(project.getVideo());
 		projectServices.saveProject(project);
 		UIActivator.setProject(project);
 		

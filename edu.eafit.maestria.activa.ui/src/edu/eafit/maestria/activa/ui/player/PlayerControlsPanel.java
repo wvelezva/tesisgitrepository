@@ -266,14 +266,7 @@ public class PlayerControlsPanel extends Composite {
 		playButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				if (mediaPlayer.isPlaying()) {
-					mediaPlayer.pause();
-					playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/play-48.png"));
-				}
-				else {
-					mediaPlayer.play();
-					playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/pause-48.png"));
-				}
+				tooglePlay(mediaPlayer.isPlaying());
 			}
 		});
 
@@ -365,5 +358,19 @@ public class PlayerControlsPanel extends Composite {
 		sceneLabel.setText(s);
 	}
 
+	private void tooglePlay(boolean isPlaying){
+		if (isPlaying) {
+			mediaPlayer.pause();
+			playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/play-48.png"));
+		}
+		else {
+			mediaPlayer.play();
+			playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/pause-48.png"));
+		}
+	}
 	
+	public void pause(){
+		if (mediaPlayer.isPlaying())
+			tooglePlay(true);
+	}
 }

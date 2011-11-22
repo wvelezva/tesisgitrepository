@@ -10,13 +10,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import uk.co.caprica.vlcj.player.AudioTrackInfo;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.TrackInfo;
 import uk.co.caprica.vlcj.player.VideoTrackInfo;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
 import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.ui.UIActivator;
@@ -24,57 +23,64 @@ import edu.eafit.maestria.activa.ui.utils.Messages;
 import edu.eafit.maestria.activa.utilities.Constants;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
-public class VlcjPlayer extends BaseVlcj {
+public class ActivaPlayer extends BaseVlcj {
 	
-	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), VlcjPlayer.class);
+	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
 	
-	private MediaPlayerFactory factory;
+	private ActivaMediaPlayerFactory factory;
 	private EmbeddedMediaPlayer player;
-	private Composite controlsPanel;
+	private PlayerControlsPanel controlsPanel;
 	private Video video;
-	private static VlcjPlayer vlcjPlayer;
+	private static ActivaPlayer vlcjPlayer;
 	
-	private VlcjPlayer(){
+	private ActivaPlayer(){
 	}
 	
-	public static VlcjPlayer getInstance() {
+	public static ActivaPlayer getInstance() {
 		if (vlcjPlayer == null)
-			vlcjPlayer = new VlcjPlayer();
+			vlcjPlayer = new ActivaPlayer();
 		
 		return vlcjPlayer;
 	}
 	
+	CanvasVideoSurface currentVideoSurface ;
 	public void createUI(Composite parent){
 		if (player == null) {
-			Composite video = new Composite(parent, SWT.CENTER);
-			video.setLayoutData(new RowData(600,400));
-			video.setBackground(new org.eclipse.swt.graphics.Color(Display.getDefault(), 0,2,2));
-			
+//			
 			/*VLC Player*/
-			Composite videoComposite = new Composite(video, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE );
-			videoComposite.setBounds(1,1, 600, 400);
+			Composite videoComposite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE );
+			videoComposite.setLayoutData(new RowData(600,400));
+			videoComposite.setVisible(true);
 
-			Frame videoFrame = SWT_AWT.new_Frame(videoComposite);
 			Canvas videoSurface = new Canvas();
 			videoSurface.setBackground(Color.black);
 			videoSurface.setSize(600, 400);
-			videoFrame.add(videoSurface);
 			
-			videoComposite.setVisible(true);
+			Frame videoFrame = SWT_AWT.new_Frame(videoComposite);
+			videoFrame.add(videoSurface);
+			Overlay overlay = new Overlay(videoFrame);
+
+			ActivaMouseAdapter activaMouseAdapter = new ActivaMouseAdapter(overlay);
+			ActivaMouseMotionAdapter activaMouseMotionAdapter = new ActivaMouseMotionAdapter(overlay);
+			videoSurface.addMouseListener(activaMouseAdapter);
+			videoSurface.addMouseMotionListener(activaMouseMotionAdapter);
 			
 			vlcArgs.add("--width=" + 600);
 		    vlcArgs.add("--height=" + 400);
-		    factory = new MediaPlayerFactory(vlcArgs);
+		    factory = new ActivaMediaPlayerFactory(vlcArgs);
 			player = factory.newEmbeddedMediaPlayer();
-			player.setVideoSurface(factory.newVideoSurface(videoSurface));
+			currentVideoSurface = factory.newVideoSurface(videoSurface);
+			player.setVideoSurface(currentVideoSurface);
 			player.setPlaySubItems(true);
 			player.setEnableKeyInputHandling(false);
 		    player.setEnableMouseInputHandling(false);
-		    
+		    player.setOverlay(overlay);
 		    controlsPanel = new PlayerControlsPanel(parent, player);
+		   
 		}
 	}
 	
+		
 	/**
 	 * Release the media player component and the associated native media player
 	 * resources.
@@ -94,14 +100,6 @@ public class VlcjPlayer extends BaseVlcj {
 		onAfterRelease();
 	}
 	
-//	public static VlcjPlayer getInstance(){
-//		if (vlcjPlayer == null) {
-//			throw new RuntimeException("The player hasn't been initialized. You have to call createUI first");
-//		}
-//		
-//		return vlcjPlayer;
-//	}
-	
 	private void onAfterRelease() {
 	}
 
@@ -114,14 +112,6 @@ public class VlcjPlayer extends BaseVlcj {
 		}
 		return player;
 	}
-
-//	public MediaPlayerFactory getMediaPlayerFactory() {
-//		return mediaPlayerFactory;
-//	}
-//
-//	public EmbeddedMediaPlayer getEmbeddedMediaPlayer() {
-//		return embeddedMediaPlayer;
-//	}
 
 	/**
 	 * when is a new project the first snece is saved
@@ -175,8 +165,8 @@ public class VlcjPlayer extends BaseVlcj {
 		    // Don't care if unblocked early
 	    }
 		player.pause();
-		controlsPanel.setEnabled(true);
-		return true;
+		enable();
+        return true;
 	}
 	
 	private void saveSnapshot(long scene) {
@@ -228,19 +218,27 @@ public class VlcjPlayer extends BaseVlcj {
 	}
 	
 	public void enable(){
+		player.enableOverlay(true);
 		controlsPanel.setEnabled(true);
 	}
 	
 	public void disable(){
 		video = null;
 		player.stop();
+		player.enableOverlay(false);
 		controlsPanel.setEnabled(false);
 	}
+	
+	
+		  
+	public void pause() {
+		controlsPanel.pause();
+	}
+	
 	
 //de estas hay que buscar que se puede configurar, yo creo que muchas ya estan en forma de sets
 //		player.addMediaOptions(paramArrayOfString);
 //		player.setStandardMediaOptions(options);
-//		player.enableOverlay(true);
 //		System.out.println("aspect ratio: " + player.getAspectRatio());
 //		System.out.println("frames por segundo:" + player.getFps());
 //		System.out.println("length in ms:" + player.getLength());

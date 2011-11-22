@@ -14,7 +14,7 @@ import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.services.IProjectServices;
 import edu.eafit.maestria.activa.services.ProjectServicesImpl;
 import edu.eafit.maestria.activa.ui.UIActivator;
-import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.ui.utils.Messages;
 import edu.eafit.maestria.activa.utilities.Constants;
 import edu.eafit.maestria.activa.utilities.LogUtil;
@@ -44,7 +44,7 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 			
 			IProjectServices projectServices = ProjectServicesImpl.getInstance();
 			Project project = projectServices.loadProject(dirName);
-			VlcjPlayer.getInstance().prepareMedia(project.getVideo());
+			ActivaPlayer.getInstance().prepareMedia(project.getVideo());
 			UIActivator.setProject(project);
 		}
 		

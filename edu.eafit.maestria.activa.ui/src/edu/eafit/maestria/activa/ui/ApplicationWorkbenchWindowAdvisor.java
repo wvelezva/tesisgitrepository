@@ -3,7 +3,7 @@ package edu.eafit.maestria.activa.ui;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
-import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
@@ -25,7 +25,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
     
     public void dispose() {
-    	VlcjPlayer.getInstance().release();
+    	ActivaPlayer.getInstance().release();
     }
     
 }

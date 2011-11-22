@@ -8,7 +8,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.eafit.maestria.activa.ui.UIActivator;
-import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class CloseHandler extends AbstractHandler implements IHandler {
@@ -27,7 +27,7 @@ public class CloseHandler extends AbstractHandler implements IHandler {
 		}
 		
 		if (saved) {
-			VlcjPlayer.getInstance().disable();
+			ActivaPlayer.getInstance().disable();
 			UIActivator.setProject(null);
 		}
 		return null;

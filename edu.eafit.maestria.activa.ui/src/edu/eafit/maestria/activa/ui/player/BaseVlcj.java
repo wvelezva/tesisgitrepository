@@ -34,7 +34,7 @@ public abstract class BaseVlcj {
 	 * Log level, used only if the -Dvlcj.log= system property has not already
 	 * been set.
 	 */
-	private static final String VLCJ_LOG_LEVEL = "DEBUG";
+	private static final String VLCJ_LOG_LEVEL = "INFO";
 
 	/**
 	 * Change this to point to your own vlc installation, or comment out the
@@ -71,15 +71,18 @@ public abstract class BaseVlcj {
 	    vlcArgs.add("--no-video-title-show");
 	    vlcArgs.add("--no-snapshot-preview");
 	    vlcArgs.add("--auto-preparse");
-	    if (!"DEBUG".equals(System.getProperty("vlcj.log"))) {
+	    vlcArgs.add("--intf");
+
+	    if (!"DEBUG".equals(System.getProperty("vlcj.log")) && !"TRACE".equals(System.getProperty("vlcj.log"))) {
 		    vlcArgs.add("--quiet");
 		    vlcArgs.add("--quiet-synchro");
 	    } else {
 	    	vlcArgs.add("-vvv");
 	    }
-	    //vlcArgs.add("--intf");
+	    
 	    if (RuntimeUtil.isMac())
 	    	vlcArgs.add("--vout=macosx");
+	    
 	    vlcArgs.add("dummy");
 	}
 }

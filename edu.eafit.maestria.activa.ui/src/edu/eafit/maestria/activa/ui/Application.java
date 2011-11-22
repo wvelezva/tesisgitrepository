@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import edu.eafit.maestria.activa.ui.player.VlcjPlayer;
+import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 
 /**
  * This class controls all aspects of the application's execution

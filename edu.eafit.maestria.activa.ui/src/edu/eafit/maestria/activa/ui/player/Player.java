@@ -24,12 +24,12 @@ public class Player extends ViewPart {
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
-		Composite player = new Composite(parent, SWT.NONE);
+		Composite player = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
 		RowLayout playerLayout = new RowLayout(SWT.VERTICAL);
 		player.setLayout(playerLayout);
 		//player.setLayoutData(new RowData(600,600));
 		
-		VlcjPlayer.getInstance().createUI(player);
+		ActivaPlayer.getInstance().createUI(player);
 		
 	}
 	
