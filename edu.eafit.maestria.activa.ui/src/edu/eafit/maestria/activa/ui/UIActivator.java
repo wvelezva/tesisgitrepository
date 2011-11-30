@@ -9,6 +9,7 @@ public class UIActivator extends AbstractUIPlugin {
 
 	private static Project project;
 	
+	
 	// The shared instance.
     private static UIActivator plugin;
     

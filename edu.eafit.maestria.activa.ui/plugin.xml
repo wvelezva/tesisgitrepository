@@ -537,31 +537,86 @@
             locationURI="toolbar:activa.ui.view.player">
         <command
               commandId="activa.ui.command.player.select"
-              icon="icons/16/select-icon 16.png"
+              icon="icons/16/select-restangular-icon 16.png"
               label="%command.player.select"
-              style="push"
+              style="radio"
               tooltip="%command.player.select">
+        </command>
+        <command
+              commandId="activa.ui.command.player.move"
+              icon="icons/16/select-icon 16.png"
+              label="%command.player.move"
+              style="radio"
+              tooltip="%command.player.move">
         </command>
         <command
               commandId="activa.ui.command.player.drawRectangle"
               icon="icons/16/shape-square-icon 16.png"
               label="%command.player.drawRectangle"
-              style="push"
+              style="radio"
               tooltip="%command.player.drawRectangle">
          </command>
          <command
               commandId="activa.ui.command.player.drawPolygon"
               icon="icons/16/draw-polygon-icon 16.png"
               label="%command.player.drawPolygon"
-              style="push"
+              style="radio"
               tooltip="%command.player.drawPolygon">
          </command>
          <command
               commandId="activa.ui.command.player.selectWand"
               icon="icons/16/wand-icon 16.png"
               label="%command.player.selectWand"
-              style="push"
+              style="radio"
               tooltip="%command.player.selectWand">
+         </command>
+         <separator
+               name="activa.ui.separator8"
+               visible="true">
+         </separator>
+         <command
+               commandId="activa.ui.command.player.setColor"
+               icon="icons/16/red-16.png"
+               label="%red"
+               style="radio"
+               tooltip="%red">
+            <parameter
+                  name="activa.ui.param.color"
+                  value="red">
+            </parameter>
+         </command>
+         <command
+               commandId="activa.ui.command.player.setColor"
+               icon="icons/16/green-16.png"
+               label=" %green"
+               style="radio"
+               tooltip="%green">
+            <parameter
+                  name="activa.ui.param.color"
+                  value="green">
+            </parameter>
+         </command>
+         <command
+               commandId="activa.ui.command.player.setColor"
+               icon="icons/16/yellow-16.png"
+               label="%yellow"
+               style="radio"
+               tooltip="%yellow">
+            <parameter
+                  name="activa.ui.param.color"
+                  value="yellow">
+            </parameter>
+         </command>
+         <command
+               commandId="activa.ui.command.player.setColor"
+               icon="icons/16/blue-16.png"
+               label="%blue"
+               style="radio"
+               tooltip="%blue">
+            <parameter
+                  name="activa.ui.param.color"
+                  value="blue">
+            </parameter>
          </command>
       </menuContribution>
       
@@ -754,25 +809,25 @@
       		categoryId="activa.ui.category.view.show"
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.view.show.red"
-            name="%command.view.show.red">
+            name="%red">
       </command>
       <command
       		categoryId="activa.ui.category.view.show"
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.view.show.green"
-            name="%command.view.show.green">
+            name="%green">
       </command>
       <command
       		categoryId="activa.ui.category.view.show"
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.view.show.yellow"
-            name="%command.view.show.yellow">
+            name="%yellow">
       </command>
       <command
       		categoryId="activa.ui.category.view.show"
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.view.show.blue"
-            name="%command.view.show.blue">
+            name="%blue">
       </command>
       <!-- Detect Category -->
       <category
@@ -900,19 +955,19 @@
       </category>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.DrawRectangleHandler"
             id="activa.ui.command.player.drawRectangle"
             name="%command.player.drawRectangle">
       </command>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.DrawPolygonHandler"
             id="activa.ui.command.player.drawPolygon"
             name="%command.player.drawPolygon">
       </command>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.SelectHandler"
             id="activa.ui.command.player.select"
             name="%command.player.select">
       </command>
@@ -921,6 +976,23 @@
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
             id="activa.ui.command.player.selectWand"
             name="%command.player.selectWand">
+      </command>
+      <command
+            category="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.SetColorHandler"
+            id="activa.ui.command.player.setColor"
+            name="%command.player.setColor">
+         <commandParameter
+               id="activa.ui.param.color"
+               name="Color"
+               optional="false">
+         </commandParameter>
+      </command>
+      <command
+            categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.MoveHandler"
+            id="activa.ui.command.player.move"
+            name="%command.player.move">
       </command>
    </extension>
    

@@ -3,19 +3,25 @@ package edu.eafit.maestria.activa.ui.player;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Frame;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import uk.co.caprica.vlcj.player.AudioTrackInfo;
+import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.TrackInfo;
 import uk.co.caprica.vlcj.player.VideoTrackInfo;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
-import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
 import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.ui.UIActivator;
@@ -27,10 +33,16 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
 	
-	private ActivaMediaPlayerFactory factory;
+	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	
+	//private ActivaMediaPlayerFactory factory;
+	private MediaPlayerFactory factory;
 	private EmbeddedMediaPlayer player;
 	private PlayerControlsPanel controlsPanel;
 	private Video video;
+	private Frame videoFrame; 
+	private Canvas videoSurface;
+	
 	private static ActivaPlayer vlcjPlayer;
 	
 	private ActivaPlayer(){
@@ -43,7 +55,6 @@ public class ActivaPlayer extends BaseVlcj {
 		return vlcjPlayer;
 	}
 	
-	CanvasVideoSurface currentVideoSurface ;
 	public void createUI(Composite parent){
 		if (player == null) {
 //			
@@ -52,34 +63,58 @@ public class ActivaPlayer extends BaseVlcj {
 			videoComposite.setLayoutData(new RowData(600,400));
 			videoComposite.setVisible(true);
 
-			Canvas videoSurface = new Canvas();
+			videoSurface = new Canvas();
 			videoSurface.setBackground(Color.black);
 			videoSurface.setSize(600, 400);
 			
-			Frame videoFrame = SWT_AWT.new_Frame(videoComposite);
+			videoFrame = SWT_AWT.new_Frame(videoComposite);
 			videoFrame.add(videoSurface);
-			Overlay overlay = new Overlay(videoFrame);
-
-			ActivaMouseAdapter activaMouseAdapter = new ActivaMouseAdapter(overlay);
-			ActivaMouseMotionAdapter activaMouseMotionAdapter = new ActivaMouseMotionAdapter(overlay);
-			videoSurface.addMouseListener(activaMouseAdapter);
-			videoSurface.addMouseMotionListener(activaMouseMotionAdapter);
-			
 			vlcArgs.add("--width=" + 600);
 		    vlcArgs.add("--height=" + 400);
 		    factory = new ActivaMediaPlayerFactory(vlcArgs);
 			player = factory.newEmbeddedMediaPlayer();
-			currentVideoSurface = factory.newVideoSurface(videoSurface);
-			player.setVideoSurface(currentVideoSurface);
+			player.setVideoSurface(factory.newVideoSurface(videoSurface));
 			player.setPlaySubItems(true);
 			player.setEnableKeyInputHandling(false);
 		    player.setEnableMouseInputHandling(false);
-		    player.setOverlay(overlay);
+		    
 		    controlsPanel = new PlayerControlsPanel(parent, player);
 		   
 		}
 	}
+
+	private void setOverlay() {
+		videoSurface.addMouseListener(new DrawRectangleMouseAdapter());
+		videoSurface.addMouseMotionListener(new DrawRectangleMouseMotionAdapter());
+		player.setOverlay( new Overlay(videoFrame));
+	    player.enableOverlay(true);
+	    
+	    long period = 0;
+		if (player.getFps() > 0) {
+			double floor = Math.floor(1000/player.getFps());
+			period = Double.valueOf(floor).longValue();
+		} else {
+			 period = 41; //1000 (one second in milliseconds) / number of frame by default
+		}
+		
+		executorService.scheduleAtFixedRate(new UpdateOverlay(), 0L, period, TimeUnit.MILLISECONDS);
+	}
 	
+	public void addActivaMouseListener(ActivaMouseAdapter mouseListener) {
+		for (MouseListener ml : videoSurface.getMouseListeners()) {
+			videoSurface.removeMouseListener(ml);
+		}
+		mouseListener.setOverlay((Overlay)player.getOverlay());
+		videoSurface.addMouseListener(mouseListener);
+	}
+	
+	public void addActivaMouseMotionListener(ActivaMouseMotionAdapter mouseMotionListener) {
+		for (MouseMotionListener mml : videoSurface.getMouseMotionListeners()) {
+			videoSurface.removeMouseMotionListener(mml);
+		}
+		mouseMotionListener.setOverlay((Overlay)player.getOverlay());
+		videoSurface.addMouseMotionListener(mouseMotionListener);
+	}
 		
 	/**
 	 * Release the media player component and the associated native media player
@@ -113,6 +148,12 @@ public class ActivaPlayer extends BaseVlcj {
 		return player;
 	}
 
+	public Overlay getOverlay(){
+		if (player == null) {
+			throw new RuntimeException("The player hasn't been initialized. You have to call VlcjPlayer.createUI(composite) first");
+		}
+		return (Overlay)player.getOverlay();
+	}
 	/**
 	 * when is a new project the first snece is saved
 	 * @param video
@@ -148,6 +189,7 @@ public class ActivaPlayer extends BaseVlcj {
 		
 		saveSnapshot(scene);
 		
+		setOverlay();
 		return true;
 	}
 
@@ -166,6 +208,7 @@ public class ActivaPlayer extends BaseVlcj {
 	    }
 		player.pause();
 		enable();
+		setOverlay();
         return true;
 	}
 	
@@ -228,11 +271,31 @@ public class ActivaPlayer extends BaseVlcj {
 		player.enableOverlay(false);
 		controlsPanel.setEnabled(false);
 	}
-	
-	
 		  
 	public void pause() {
-		controlsPanel.pause();
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				controlsPanel.pause();
+			}
+		});
+	}
+	
+	private final class UpdateOverlay implements Runnable {
+
+		@Override
+		public void run() {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+//					if (player.isPlaying()) {
+						double currentFrame = Math.floor((player.getFps()/1000)*player.getTime());
+						int frame = Double.valueOf(currentFrame).intValue();
+						((Overlay)player.getOverlay()).setCurrentFrame(frame);
+//					}
+				}
+			});
+		}
 	}
 	
 	

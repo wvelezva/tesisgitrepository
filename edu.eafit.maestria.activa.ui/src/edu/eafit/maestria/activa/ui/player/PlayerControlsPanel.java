@@ -39,6 +39,7 @@ public class PlayerControlsPanel extends Composite {
 	private Label timeLabel;
 	private Scale positionScale;
 	private Label sceneLabel;
+	private Label frameLabel;
 	
 	private Button previousFrameButton;
 	private Button rewindButton;
@@ -62,8 +63,8 @@ public class PlayerControlsPanel extends Composite {
 		createBottomPanel();
 		registerListeners();
 		setEnabled(false);
-
-		executorService.scheduleAtFixedRate(new UpdateRunnable(mediaPlayer), 0L, 1L, TimeUnit.SECONDS);
+		
+		executorService.scheduleAtFixedRate(new UpdateControls(mediaPlayer), 0L, 1L, TimeUnit.SECONDS);
 	}
 
 	private void createTopPanel() {
@@ -79,7 +80,7 @@ public class PlayerControlsPanel extends Composite {
 //		Composite positionPanel = new Composite(this, SWT.FLAT);
 //		positionPanel.setLayout(new GridLayout(1, true));
 		positionScale = new Scale(topPanel, SWT.HORIZONTAL);
-		positionScale.setLayoutData(new RowData(468, SWT.DEFAULT));
+		positionScale.setLayoutData(new RowData(450, SWT.DEFAULT));
 		positionScale.setMinimum(0);
 		positionScale.setMaximum(1000);
 		positionScale.setIncrement(1);
@@ -87,6 +88,8 @@ public class PlayerControlsPanel extends Composite {
 
 		sceneLabel = new Label(topPanel, SWT.NONE);
 		sceneLabel.setText("1/1");
+		frameLabel = new Label(topPanel, SWT.NONE);
+		frameLabel.setText("0000000000");
 	}
 	
 	public void setEnabled(boolean enabled){
@@ -95,6 +98,7 @@ public class PlayerControlsPanel extends Composite {
 			positionScale.setSelection(0);
 			volumeScale.setSelection(0);
 			sceneLabel.setText("1/1");
+			frameLabel.setText("0000000000");
 		}
 		super.setEnabled(enabled);
 	}
@@ -168,20 +172,20 @@ public class PlayerControlsPanel extends Composite {
 	}
 
 	private void updateUIState() {
-		if (!mediaPlayer.isPlaying()) {
-			// Resume play or play a few frames then pause to show current
-			// position in video
-			mediaPlayer.play();
-			if (!mousePressedPlaying) {
-				try {
-					// Half a second probably gets an iframe
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					// Don't care if unblocked early
-				}
-				mediaPlayer.pause();
-			}
-		}
+//		if (!mediaPlayer.isPlaying()) {
+//			// Resume play or play a few frames then pause to show current
+//			// position in video
+//			mediaPlayer.play();
+//			if (!mousePressedPlaying) {
+//				try {
+//					// Half a second probably gets an iframe
+//					Thread.sleep(500);
+//				} catch (InterruptedException e) {
+//					// Don't care if unblocked early
+//				}
+//				mediaPlayer.pause();
+//			}
+//		}
 		long time = mediaPlayer.getTime();
 		int position = (int) (mediaPlayer.getPosition() * 1000.0f);
 		int chapter = mediaPlayer.getChapter();
@@ -189,6 +193,13 @@ public class PlayerControlsPanel extends Composite {
 		updateTime(time);
 		updatePosition(position);
 		updateScene(chapter, chapterCount);
+		updateFrames(time);
+	}
+
+	private void updateFrames(long time) {
+		double currentFrame = Math.floor((mediaPlayer.getFps()/1000)*time);
+		long frame = Double.valueOf(currentFrame).longValue();
+		frameLabel.setText(Long.toString(frame));
 	}
 
 	private void skip(int skipTime) {
@@ -242,7 +253,8 @@ public class PlayerControlsPanel extends Composite {
 		previousFrameButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				mediaPlayer.previousChapter();
+				double floor = Math.floor(1000/mediaPlayer.getFps());
+				skip(-Double.valueOf(floor).intValue());
 			}
 		});
 
@@ -281,6 +293,10 @@ public class PlayerControlsPanel extends Composite {
 			@Override
 			public void handleEvent(Event event) {
 				mediaPlayer.nextFrame();
+//				System.out.println("time:" +mediaPlayer.getTime());
+//				System.out.println("position:" + mediaPlayer.getPosition() * 1000.0f);
+//				System.out.println("frame:" + Math.floor((mediaPlayer.getFps()/1000)*mediaPlayer.getTime()));
+				updateUIState();
 			}
 		});
 
@@ -306,17 +322,18 @@ public class PlayerControlsPanel extends Composite {
 
 	}
 
-	private final class UpdateRunnable implements Runnable {
+	private final class UpdateControls implements Runnable {
 
-		private final MediaPlayer mediaPlayer;
+		private final EmbeddedMediaPlayer mediaPlayer;
 
-		private UpdateRunnable(MediaPlayer mediaPlayer) {
+		private UpdateControls(EmbeddedMediaPlayer mediaPlayer) {
 			this.mediaPlayer = mediaPlayer;
 		}
 
 		@Override
 		public void run() {
 			final long time = mediaPlayer.getTime();
+			
 			final int position = (int) (mediaPlayer.getPosition() * 1000.0f);
 			final int chapter = mediaPlayer.getChapter();
 			final int chapterCount = mediaPlayer.getChapterCount();
@@ -331,21 +348,18 @@ public class PlayerControlsPanel extends Composite {
 						updateTime(time);
 						updatePosition(position);
 						updateScene(chapter, chapterCount);
+						updateFrames(time);
 					}
 				}
 			});
 		}
 	}
-
+	
 	private void updateTime(long millis) {
 		String s = String.format("%02d:%02d:%02d",
 				TimeUnit.MILLISECONDS.toHours(millis),
-				TimeUnit.MILLISECONDS.toMinutes(millis)
-						- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-								.toHours(millis)),
-				TimeUnit.MILLISECONDS.toSeconds(millis)
-						- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-								.toMinutes(millis)));
+				TimeUnit.MILLISECONDS.toMinutes(millis)	- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+				TimeUnit.MILLISECONDS.toSeconds(millis)	- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
 		timeLabel.setText(s);
 	}
 

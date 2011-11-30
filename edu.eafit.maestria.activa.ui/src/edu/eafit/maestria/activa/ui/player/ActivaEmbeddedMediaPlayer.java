@@ -317,13 +317,13 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    @Override
 	    public void windowDeactivated(WindowEvent e) {
 	      Logger.trace("windowDeactivated(e={})", e);
-	      //hideOverlay();
+	      hideOverlay();
 	    }
 
 	    @Override
 	    public void windowActivated(WindowEvent e) {
 	      Logger.trace("windowActivated(e={})", e);
-	      //showOverlay();
+	      showOverlay();
 	    }
 	  }
 	  

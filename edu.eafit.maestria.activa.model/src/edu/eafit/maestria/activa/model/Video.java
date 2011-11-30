@@ -2,7 +2,9 @@ package edu.eafit.maestria.activa.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -19,6 +21,7 @@ public class Video implements Convertable{
 	//esto es opcional hay que ver en cual de los archivos de metadatos va o se replica
 	private long length; //duration in ms
 	private float fps; //frames per second
+	private int totalFrames;
 	private int width;
 	private int height;
 
@@ -30,7 +33,9 @@ public class Video implements Convertable{
 	
 	@XStreamImplicit
 	private List<Scene> scenes;
-
+	
+	private Map<Integer, List<Node>> nodes;
+	
 	@XStreamOmitField
 	private boolean modified;
 	
@@ -65,7 +70,13 @@ public class Video implements Convertable{
 	public void setLength(long length) {
 		modified = true;
 		this.length = length;
+		updateTotalFrames();
 	}
+	private void updateTotalFrames() {
+		if (fps > 0 && length > 0 && totalFrames == 0)
+			totalFrames = Double.valueOf(Math.floor(fps*(length/1000))).intValue();
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -100,6 +111,7 @@ public class Video implements Convertable{
 	public void setFps(float fps) {
 		modified = true;
 		this.fps = fps;
+		updateTotalFrames();
 	}
 	public String getAudioCodec() {
 		return audioCodec;
@@ -144,6 +156,27 @@ public class Video implements Convertable{
 	@Override
 	public void resetModified(){
 		modified=false;
+	}
+
+	public Map<Integer, List<Node>> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(Integer frame, List<Node> nodes) {
+		if (this.nodes == null)
+			this.nodes = new HashMap<Integer, List<Node>>();
+		
+		this.nodes.put(frame, nodes);
+	}
+	
+	public List<Node> getNodesByFrame(Integer frame){
+		if (nodes == null)
+			return null;
+		return nodes.get(frame);
+	}
+	
+	public int getTotalFrames() {
+		return totalFrames;
 	}
 	
 }
