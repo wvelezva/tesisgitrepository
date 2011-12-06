@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: acTiVa Services
+Bundle-SymbolicName: edu.eafit.maestria.activa.services
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.eafit.maestria.activa.services.ServicesActivator
+Require-Bundle: org.eclipse.core.runtime,
+ edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.dao;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.model;bundle-version="0.0.1",
+ xstream;bundle-version="1.4.2",
+ libs;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: edu.eafit.maestria.activa.services

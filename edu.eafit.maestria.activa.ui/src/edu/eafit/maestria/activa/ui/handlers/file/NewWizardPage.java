@@ -2,7 +2,7 @@ package edu.eafit.maestria.activa.ui.handlers.file;
 
 import java.io.File;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;

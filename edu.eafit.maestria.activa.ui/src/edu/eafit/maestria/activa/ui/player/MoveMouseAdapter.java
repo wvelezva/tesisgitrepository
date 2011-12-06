@@ -2,7 +2,7 @@ package edu.eafit.maestria.activa.ui.player;
 
 import java.awt.event.MouseEvent;
 
-import edu.eafit.maestria.activa.model.Node;
+import edu.eafit.maestria.activa.services.AnimationUtils;
 
 public class MoveMouseAdapter extends ActivaMouseAdapter{
 	
@@ -22,16 +22,14 @@ public class MoveMouseAdapter extends ActivaMouseAdapter{
 	public void mousePressed(MouseEvent e){
 		ActivaPlayer.getInstance().pause();
 		overlay.setMousePt(e.getPoint());
-		if (Node.selectOne(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame())) {
+		if (AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame())) {
             overlay.setSelecting(false);
         } else {
-            Node.selectNone(overlay.getNodes());
+            AnimationUtils.selectNone(overlay.getAnimations());
             overlay.setSelecting(true);
         }
 		
-		//Node.selectOne(overlay.getNodes(), overlay.getMousePt());
-        
-        overlay.repaint();
+		overlay.repaint();
 	}
 
 }

@@ -10,5 +10,5 @@ Require-Bundle: edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
  xstream;bundle-version="1.4.2"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: edu.eafit.maestria.activa.model.ModelActivator
-Export-Package: edu.eafit.maestria.activa.model,
+Export-Package: edu.eafit.maestria.activa.model;uses:="edu.eafit.maestria.activa.utilities,edu.eafit.maestria.activa.model.converters",
  edu.eafit.maestria.activa.services

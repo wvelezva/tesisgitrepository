@@ -64,7 +64,7 @@ public class PlayerControlsPanel extends Composite {
 		registerListeners();
 		setEnabled(false);
 		
-		executorService.scheduleAtFixedRate(new UpdateControls(mediaPlayer), 0L, 1L, TimeUnit.SECONDS);
+		executorService.scheduleAtFixedRate(new UpdateControls(mediaPlayer), 0L, 250L, TimeUnit.MILLISECONDS);
 	}
 
 	private void createTopPanel() {
@@ -376,6 +376,7 @@ public class PlayerControlsPanel extends Composite {
 		if (isPlaying) {
 			mediaPlayer.pause();
 			playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/play-48.png"));
+			updateUIState();
 		}
 		else {
 			mediaPlayer.play();

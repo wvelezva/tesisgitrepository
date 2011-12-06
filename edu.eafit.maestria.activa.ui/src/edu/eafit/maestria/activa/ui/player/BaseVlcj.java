@@ -3,7 +3,7 @@ package edu.eafit.maestria.activa.ui.player;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import uk.co.caprica.vlcj.logger.Logger;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;

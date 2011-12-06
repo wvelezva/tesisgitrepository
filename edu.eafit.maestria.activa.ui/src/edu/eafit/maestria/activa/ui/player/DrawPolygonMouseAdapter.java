@@ -3,8 +3,9 @@ package edu.eafit.maestria.activa.ui.player;
 import java.awt.Polygon;
 import java.awt.event.MouseEvent;
 
-import edu.eafit.maestria.activa.model.Node;
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.ShapeKind;
+import edu.eafit.maestria.activa.services.AnimationUtils;
 
 public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
 	
@@ -22,18 +23,18 @@ public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
 		overlay.setMousePt(e.getPoint());
 		
 		if (e.isShiftDown()) {
-            Node.selectToggle(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame());
+            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
         } else if (e.isPopupTrigger()) {
-			Node.selectOne(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame());
+			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
 			overlay.showPopup(e.getComponent(), e.getX(), e.getY());
 		} else {
-            Node.selectNone(overlay.getNodes());
+            AnimationUtils.selectNone(overlay.getAnimations());
             overlay.setDrawing(true);
         }
 		if (isCompleted()) {
 			overlay.getPolygon().addPoint(overlay.getPolygon().xpoints[0], overlay.getPolygon().ypoints[0]);
-			Node.selectNone(overlay.getNodes());
-            Node n = new Node(overlay.getPolygon(), overlay.getCurrentColor(), ShapeKind.POLYGON, overlay.getCurrentFrame());
+			AnimationUtils.selectNone(overlay.getAnimations());
+            Animation n = new Animation(overlay.getPolygon(), overlay.getCurrentColor(), ShapeKind.POLYGON, overlay.getCurrentFrame());
             n.setSelected(true);
             overlay.add(n);
             

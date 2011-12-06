@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.swt.SWT;
@@ -33,7 +34,7 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
 	
-	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService executorService; 
 	
 	//private ActivaMediaPlayerFactory factory;
 	private MediaPlayerFactory factory;
@@ -91,13 +92,15 @@ public class ActivaPlayer extends BaseVlcj {
 	    
 	    long period = 0;
 		if (player.getFps() > 0) {
-			double floor = Math.floor(1000/player.getFps());
+			double floor = Math.floor(1000/player.getFps()/1.5);
 			period = Double.valueOf(floor).longValue();
 		} else {
-			 period = 41; //1000 (one second in milliseconds) / number of frame by default
+			 period = 28; //(1000/24)/1.5=28 one second in milliseconds/number of frames by default
 		}
 		
-		executorService.scheduleAtFixedRate(new UpdateOverlay(), 0L, period, TimeUnit.MILLISECONDS);
+		executorService = Executors.newSingleThreadScheduledExecutor();
+		ScheduledFuture sf = executorService.scheduleAtFixedRate(new UpdateOverlay(), 0L, period, TimeUnit.MILLISECONDS);
+		
 	}
 	
 	public void addActivaMouseListener(ActivaMouseAdapter mouseListener) {
@@ -267,8 +270,10 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	public void disable(){
 		video = null;
+		executorService.shutdown();
 		player.stop();
 		player.enableOverlay(false);
+		player.setOverlay(null);
 		controlsPanel.setEnabled(false);
 	}
 		  

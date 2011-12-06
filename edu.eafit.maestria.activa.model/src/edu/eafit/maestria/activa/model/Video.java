@@ -34,7 +34,8 @@ public class Video implements Convertable{
 	@XStreamImplicit
 	private List<Scene> scenes;
 	
-	private Map<Integer, List<Node>> nodes;
+	//@XStreamImplicit
+	private Map<Integer, List<Animation>> animations;
 	
 	@XStreamOmitField
 	private boolean modified;
@@ -158,21 +159,22 @@ public class Video implements Convertable{
 		modified=false;
 	}
 
-	public Map<Integer, List<Node>> getNodes() {
-		return nodes;
+	public Map<Integer, List<Animation>> getAnimations() {
+		return animations;
 	}
 
-	public void setNodes(Integer frame, List<Node> nodes) {
-		if (this.nodes == null)
-			this.nodes = new HashMap<Integer, List<Node>>();
+	public void setAnimations(Integer frame, List<Animation> animations) {
+		modified = true;
+		if (this.animations == null)
+			this.animations = new HashMap<Integer, List<Animation>>();
 		
-		this.nodes.put(frame, nodes);
+		this.animations.put(frame, animations);
 	}
 	
-	public List<Node> getNodesByFrame(Integer frame){
-		if (nodes == null)
+	public List<Animation> getAnimationsByFrame(Integer frame){
+		if (animations == null)
 			return null;
-		return nodes.get(frame);
+		return animations.get(frame);
 	}
 	
 	public int getTotalFrames() {

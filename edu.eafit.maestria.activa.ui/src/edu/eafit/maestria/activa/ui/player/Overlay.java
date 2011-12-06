@@ -17,14 +17,14 @@ import javax.swing.JPopupMenu;
 
 import com.sun.awt.AWTUtilities;
 
-import edu.eafit.maestria.activa.model.Node;
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.ui.UIActivator;
 
 public class Overlay extends Window {
 
 	private static final long serialVersionUID = 1L;
 	
-	private List<Node> nodes = new ArrayList<Node>();
+	private List<Animation> animations = new ArrayList<Animation>();
 	private int currentFrame;
 	private Point mousePt = new Point(0, 0);
     private Rectangle mouseRect = new Rectangle();
@@ -45,6 +45,7 @@ public class Overlay extends Window {
 		//AWTUtilities.setWindowOpacity(this, 0.1f);
 		setLayout(null);
 		
+		
 	}
 	
 	@Override
@@ -56,14 +57,14 @@ public class Overlay extends Window {
 		
 		Graphics2D g2 = (Graphics2D) g;
 		//g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		List<Node> nodesToPaint = getNodesToPaint();
-		if (nodesToPaint != null) {
-			for (Node n : nodesToPaint) {
+		List<Animation> animationsToPaint = getAnimationsToPaint();
+		if (animationsToPaint != null) {
+			for (Animation n : animationsToPaint) {
 				g2.setPaint(n.getColor());
 				g2.setStroke(drawStroke);
 				g2.draw(n.getShape(currentFrame));
 			}
-			for (Node n : nodesToPaint) {
+			for (Animation n : animationsToPaint) {
 				if (n.isSelected()) {
 					g2.setColor(Color.darkGray);
 		            g2.setStroke(selectStroke);
@@ -87,8 +88,8 @@ public class Overlay extends Window {
 		
 	}
 	
-	public List<Node> getNodes() {
-		return nodes;
+	public List<Animation> getAnimations() {
+		return animations;
 	}
 
 	public Color getCurrentColor() {
@@ -144,7 +145,7 @@ public class Overlay extends Window {
 	}
 
 	public void setCurrentFrame(int currentFrame) {
-		nodes = UIActivator.getProject().getVideo().getNodesByFrame(currentFrame);
+		animations = UIActivator.getProject().getVideo().getAnimationsByFrame(currentFrame);
 		this.currentFrame = currentFrame;  
 		this.repaint();
 	}
@@ -153,17 +154,17 @@ public class Overlay extends Window {
 		return currentFrame;
 	}
 
-	public void add(Node n) {
-		if (nodes == null) {
-			nodes = new ArrayList<Node>();
-			UIActivator.getProject().getVideo().setNodes(currentFrame, nodes);
+	public void add(Animation n) {
+		if (animations == null) {
+			animations = new ArrayList<Animation>();
+			UIActivator.getProject().getVideo().setAnimations(currentFrame, animations);
 		}
 		
-		nodes.add(n);
+		animations.add(n);
 	}
 
-	private List<Node> getNodesToPaint() {
-		List<Node> nodesToPaint = new ArrayList<Node>();
+	private List<Animation> getAnimationsToPaint() {
+		List<Animation> animationsToPaint = new ArrayList<Animation>();
 		int init = currentFrame;
 		int end = currentFrame;
 
@@ -178,14 +179,14 @@ public class Overlay extends Window {
 				end = UIActivator.getProject().getVideo().getTotalFrames();
 		}*/
 		
-		if (UIActivator.getProject().getVideo().getNodes() != null) {
+		if (UIActivator.getProject().getVideo().getAnimations() != null) {
 			for (int i = init; i <= end; i ++){
-				List<Node> nodesByFrame = UIActivator.getProject().getVideo().getNodesByFrame(i);
-				if (nodesByFrame != null)
-					nodesToPaint.addAll(nodesByFrame);
+				List<Animation> animationsByFrame = UIActivator.getProject().getVideo().getAnimationsByFrame(i);
+				if (animationsByFrame != null)
+					animationsToPaint.addAll(animationsByFrame);
 			}
 		}
-		return nodesToPaint;
+		return animationsToPaint;
 	}
 
 	

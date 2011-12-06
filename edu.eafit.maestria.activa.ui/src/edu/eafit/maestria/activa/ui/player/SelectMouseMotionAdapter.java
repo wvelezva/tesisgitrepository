@@ -3,7 +3,7 @@ package edu.eafit.maestria.activa.ui.player;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import edu.eafit.maestria.activa.model.Node;
+import edu.eafit.maestria.activa.services.AnimationUtils;
 
 public class SelectMouseMotionAdapter extends ActivaMouseMotionAdapter {
 
@@ -22,10 +22,10 @@ public class SelectMouseMotionAdapter extends ActivaMouseMotionAdapter {
 					Math.min(overlay.getMousePt().y, e.getY()),
 					Math.abs(overlay.getMousePt().x - e.getX()),
 					Math.abs(overlay.getMousePt().y - e.getY()));
-			Node.selectRect(overlay.getNodes(), overlay.getMouseRect(), overlay.getCurrentFrame());
+			AnimationUtils.selectRect(overlay.getAnimations(), overlay.getMouseRect(), overlay.getCurrentFrame());
 		} else {
 			delta.setLocation(e.getX() - overlay.getMousePt().x, e.getY() - overlay.getMousePt().y);
-			Node.updatePosition(overlay.getNodes(), delta, overlay.getCurrentFrame());
+			AnimationUtils.updatePosition(overlay.getAnimations(), delta, overlay.getCurrentFrame());
 			overlay.setMousePt(e.getPoint());
 		}
 		overlay.repaint();

@@ -3,7 +3,7 @@ package edu.eafit.maestria.activa.ui.player;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
-import edu.eafit.maestria.activa.model.Node;
+import edu.eafit.maestria.activa.services.AnimationUtils;
 
 public class SelectMouseAdapter extends ActivaMouseAdapter{
 	
@@ -31,14 +31,14 @@ public class SelectMouseAdapter extends ActivaMouseAdapter{
 		
 		overlay.setMousePt(e.getPoint());
 		if (e.isShiftDown()) {
-            Node.selectToggle(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame());
+            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
         } else if (e.isPopupTrigger()) {
-			Node.selectOne(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame());
+			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
 			overlay.showPopup(e.getComponent(), e.getX(), e.getY());
-		} else if (Node.selectOne(overlay.getNodes(), overlay.getMousePt(), overlay.getCurrentFrame())) {
+		} else if (AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame())) {
             overlay.setSelecting(false);
         } else {
-            Node.selectNone(overlay.getNodes());
+            AnimationUtils.selectNone(overlay.getAnimations());
             overlay.setSelecting(true);
         }
         overlay.repaint();

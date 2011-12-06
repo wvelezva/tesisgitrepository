@@ -34,5 +34,4 @@ public class UIActivator extends AbstractUIPlugin {
 	public static Project getProject(){
 		return UIActivator.project;
 	}
-
 }

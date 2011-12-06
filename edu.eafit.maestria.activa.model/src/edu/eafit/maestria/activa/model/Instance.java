@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.List;
 
 public class Instance {
-	private Item item;
+	private IEntity item;
 	private File thumbnail;
 	private Color color;
 	private Shape shape;

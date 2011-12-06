@@ -44,8 +44,8 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 			
 			IProjectServices projectServices = ProjectServicesImpl.getInstance();
 			Project project = projectServices.loadProject(dirName);
-			ActivaPlayer.getInstance().prepareMedia(project.getVideo());
 			UIActivator.setProject(project);
+			ActivaPlayer.getInstance().prepareMedia(project.getVideo());
 		}
 		
 		return null;
