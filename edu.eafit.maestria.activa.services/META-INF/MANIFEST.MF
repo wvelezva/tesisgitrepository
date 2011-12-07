@@ -10,6 +10,6 @@ Require-Bundle: org.eclipse.core.runtime,
  edu.eafit.maestria.activa.model;bundle-version="0.0.1",
  xstream;bundle-version="1.4.2",
  libs;bundle-version="1.0.0"
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: edu.eafit.maestria.activa.services
+Bundle-ActivationPolicy: lazy
