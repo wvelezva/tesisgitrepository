@@ -3,8 +3,6 @@ package edu.eafit.maestria.activa.ui;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
-import edu.eafit.maestria.activa.services.ProjectServicesImpl;
-import edu.eafit.maestria.activa.services.ResourceServiceImpl;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -19,7 +17,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         //configurer.setShowCoolBar(true);
         //configurer.setShowStatusLine(true);
         configurer.setShowProgressIndicator(true);
-        ResourceServiceImpl r = new ResourceServiceImpl();
     }
     
     //FIXME aca es donde se debe crear un dialogo modal al salir para preguntarle al usuario en caso de no estar salvado el proyecto

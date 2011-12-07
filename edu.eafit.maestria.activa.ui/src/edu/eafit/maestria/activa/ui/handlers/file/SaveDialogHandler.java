@@ -7,8 +7,9 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
-import edu.eafit.maestria.activa.services.ProjectServicesImpl;
+import edu.eafit.maestria.activa.services.IProjectServices;
 import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.utils.Messages;
 
@@ -24,7 +25,8 @@ public class SaveDialogHandler extends AbstractHandler implements IHandler {
 					new String[] { Messages.COMMAND_FILE_BUTTON_DONT_SAVE, Messages.COMMAND_FILE_BUTTON_CANCEL, Messages.COMMAND_FILE_BUTTON_SAVE }, 0);
 			int returnCode = messageDialog.open();
 			if  (returnCode == 2) {
-				ProjectServicesImpl.getInstance().saveProject(project);
+				IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+				projectServices.saveProject(project);
 			} else if (returnCode == 1) {
 				return Boolean.FALSE;
 			}

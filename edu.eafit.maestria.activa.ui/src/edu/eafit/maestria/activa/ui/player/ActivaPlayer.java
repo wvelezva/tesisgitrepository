@@ -270,7 +270,7 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	public void disable(){
 		video = null;
-		executorService.shutdown();
+		executorService.shutdownNow();
 		player.stop();
 		player.enableOverlay(false);
 		player.setOverlay(null);
@@ -294,9 +294,12 @@ public class ActivaPlayer extends BaseVlcj {
 				@Override
 				public void run() {
 //					if (player.isPlaying()) {
+					Overlay overlay = (Overlay)player.getOverlay();
+					if (overlay !=null) {
 						double currentFrame = Math.floor((player.getFps()/1000)*player.getTime());
 						int frame = Double.valueOf(currentFrame).intValue();
-						((Overlay)player.getOverlay()).setCurrentFrame(frame);
+						overlay.setCurrentFrame(frame);
+					}
 //					}
 				}
 			});

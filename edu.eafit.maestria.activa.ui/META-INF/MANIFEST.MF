@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  edu.eafit.maestria.activa.model;bundle-version="0.0.1",
  libs;bundle-version="1.0.0",
  vlcj-bundle;bundle-version="1.2.1",
- edu.eafit.maestria.activa.services;bundle-version="0.0.1"
+ edu.eafit.maestria.activa.container;bundle-version="0.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: edu.eafit.maestria.activa.ui.UIActivator

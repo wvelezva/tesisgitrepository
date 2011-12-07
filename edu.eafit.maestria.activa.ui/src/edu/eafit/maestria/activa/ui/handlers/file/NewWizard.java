@@ -8,9 +8,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.services.IProjectServices;
-import edu.eafit.maestria.activa.services.ProjectServicesImpl;
 import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.ui.utils.Messages;
@@ -39,7 +39,7 @@ public class NewWizard extends Wizard {
 		String projectName =  newWizardPage.getProjectName();
 		File projectDir = newWizardPage.getProjectLocation();
 		File sourceVideo = new File(newWizardPage.getSourceVideo());
-		IProjectServices projectServices = ProjectServicesImpl.getInstance();
+		IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
 		Project project = projectServices.newProject(projectName, sourceVideo, projectDir);
 		if (project == null) {
 			try {

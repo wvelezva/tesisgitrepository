@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.services.IProjectServices;
-import edu.eafit.maestria.activa.services.ProjectServicesImpl;
 import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.ui.utils.Messages;
@@ -42,7 +42,7 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 			dirDialog.setFilterPath(store.getString(Constants.Preferences.WORKSPACE));
 			String dirName = dirDialog.open();
 			
-			IProjectServices projectServices = ProjectServicesImpl.getInstance();
+			IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
 			Project project = projectServices.loadProject(dirName);
 			UIActivator.setProject(project);
 			ActivaPlayer.getInstance().prepareMedia(project.getVideo());
