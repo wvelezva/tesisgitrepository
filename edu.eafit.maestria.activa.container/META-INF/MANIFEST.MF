@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: acTiVa Container
+Bundle-SymbolicName: edu.eafit.maestria.activa.container
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.eafit.maestria.activa.container.ContainerActivator
+Require-Bundle: org.eclipse.core.runtime,
+ edu.eafit.maestria.activa.services;bundle-version="0.0.1",
+ libs;bundle-version="1.0.0",
+ edu.eafit.maestria.activa.utilities;bundle-version="0.0.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: edu.eafit.maestria.activa.container
