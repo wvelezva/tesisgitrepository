@@ -32,6 +32,9 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ActivaPlayer extends BaseVlcj {
 	
+	private static final int WIDTH = 810;
+	private static final int HEIGHT = 530;
+
 	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
 	
 	private ScheduledExecutorService executorService; 
@@ -61,17 +64,17 @@ public class ActivaPlayer extends BaseVlcj {
 //			
 			/*VLC Player*/
 			Composite videoComposite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE );
-			videoComposite.setLayoutData(new RowData(600,400));
+			videoComposite.setLayoutData(new RowData(WIDTH,HEIGHT));
 			videoComposite.setVisible(true);
 
 			videoSurface = new Canvas();
 			videoSurface.setBackground(Color.black);
-			videoSurface.setSize(600, 400);
+			videoSurface.setSize(WIDTH, HEIGHT);
 			
 			videoFrame = SWT_AWT.new_Frame(videoComposite);
 			videoFrame.add(videoSurface);
-			vlcArgs.add("--width=" + 600);
-		    vlcArgs.add("--height=" + 400);
+			vlcArgs.add("--width=" + WIDTH);
+		    vlcArgs.add("--height=" + HEIGHT);
 		    factory = new ActivaMediaPlayerFactory(vlcArgs);
 			player = factory.newEmbeddedMediaPlayer();
 			player.setVideoSurface(factory.newVideoSurface(videoSurface));

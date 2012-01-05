@@ -1,17 +1,24 @@
 package edu.eafit.maestria.activa.ui.player;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.ViewPart;
 
+import edu.eafit.maestria.activa.container.Container;
+import edu.eafit.maestria.activa.model.IEntity;
+import edu.eafit.maestria.activa.services.IEntityServices;
+
 public class Player extends ViewPart {
+	
+	Properties properties;
+	
 	public Player() {
 	}
 
 	public static final String ID = "activa.ui.view.player";
+	private Table table;
 	
 	public void createPartControl(Composite parent) {
 		RowLayout rowLayout = new RowLayout();
@@ -19,18 +26,19 @@ public class Player extends ViewPart {
 		rowLayout.wrap = false;
 		parent.setLayout(rowLayout);
 		
-		ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setLayoutData(new RowData(232, parent.getSize().y));
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
+		properties = new Properties(parent, SWT.NONE);
+		properties.setEntity(((IEntityServices)Container.getInstance().getComponent(IEntityServices.class)).newEntity());
 		
 		Composite player = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
 		RowLayout playerLayout = new RowLayout(SWT.VERTICAL);
 		player.setLayout(playerLayout);
-		//player.setLayoutData(new RowData(600,600));
 		
 		ActivaPlayer.getInstance().createUI(player);
 		
+	}
+	
+	public IEntity getEntity(){
+		return properties.getEntity();
 	}
 	
 	public void setFocus() {

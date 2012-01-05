@@ -9,6 +9,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
@@ -55,10 +56,10 @@ public class PlayerControlsPanel extends Composite {
 
 	public PlayerControlsPanel(Composite parent, EmbeddedMediaPlayer mediaPlayer) {
 		super(parent, SWT.BORDER);
+		setLayout(new GridLayout(1, true));
 
 		this.mediaPlayer = mediaPlayer;
-
-		setLayout(new GridLayout(1, true));
+		
 		createTopPanel();
 		createBottomPanel();
 		registerListeners();
@@ -69,18 +70,19 @@ public class PlayerControlsPanel extends Composite {
 
 	private void createTopPanel() {
 		Composite topPanel = new Composite(this, SWT.NONE);
-		RowLayout topPanelLayout = new RowLayout(SWT.HORIZONTAL);
-		topPanelLayout.pack = true;
-		topPanel.setLayout(topPanelLayout);
+		topPanel.setLayout(new GridLayout(4,false));
 		
 		timeLabel = new Label(topPanel, SWT.NONE);
 		timeLabel.setText("hh:mm:ss");
 
-//		se usaba para poner el position slider, no se si sea necesario
-//		Composite positionPanel = new Composite(this, SWT.FLAT);
-//		positionPanel.setLayout(new GridLayout(1, true));
 		positionScale = new Scale(topPanel, SWT.HORIZONTAL);
-		positionScale.setLayoutData(new RowData(450, SWT.DEFAULT));
+		
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		topPanel.setLayoutData(gridData);
+		
+		positionScale.setLayoutData(gridData);
 		positionScale.setMinimum(0);
 		positionScale.setMaximum(1000);
 		positionScale.setIncrement(1);
@@ -105,8 +107,9 @@ public class PlayerControlsPanel extends Composite {
 
 	private void createBottomPanel() {
 		Composite bottomPanel = new Composite(this, SWT.FLAT);
-		bottomPanel.setLayout(new RowLayout(SWT.HORIZONTAL));
-		//bottomPanel.setLayout(new Flow);
+		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
+		rowLayout.fill = true;
+		bottomPanel.setLayout(rowLayout);
 		previousFrameButton = new Button(bottomPanel, SWT.PUSH);
 		previousFrameButton.setLayoutData(new RowData(54, 51));
 		
@@ -143,17 +146,16 @@ public class PlayerControlsPanel extends Composite {
 		toggleMuteButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/mute-48.png"));
 		toggleMuteButton.setToolTipText(Messages.PLAYER_MUTE);
 
-		//Composite volumeComposite = new Composite(bottomPanel, SWT.NONE);
-		volumeScale = new Scale(bottomPanel, SWT.HORIZONTAL);
-		volumeScale.setLayoutData(new RowData(100, 51));
-		volumeScale.setMinimum(LibVlcConst.MIN_VOLUME);
-		volumeScale.setMaximum(LibVlcConst.MAX_VOLUME);
-		volumeScale.setToolTipText(Messages.PLAYER_VOLUME);
-
 		markSceneButton = new Button(bottomPanel, SWT.PUSH);
 		markSceneButton.setLayoutData(new RowData(54, 51));
 		markSceneButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/NeedleWhite-icon 48.png"));
 		markSceneButton.setToolTipText(Messages.PLAYER_MARK_SCENE);
+
+		volumeScale = new Scale(bottomPanel, SWT.HORIZONTAL);
+		volumeScale.setLayoutData(new RowData(300, 51));
+		volumeScale.setMinimum(LibVlcConst.MIN_VOLUME);
+		volumeScale.setMaximum(LibVlcConst.MAX_VOLUME);
+		volumeScale.setToolTipText(Messages.PLAYER_VOLUME);
 	}
 
 	/**

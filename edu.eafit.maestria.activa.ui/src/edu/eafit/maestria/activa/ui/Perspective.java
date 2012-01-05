@@ -32,7 +32,7 @@ public class Perspective implements IPerspectiveFactory {
 		folder.addPlaceholder(Player.ID + ":*");
 		folder.addView(Player.ID);
 		
-		IFolderLayout scenes = layout.createFolder("scenes", IPageLayout.TOP, 0.25f, editorArea);
+		IFolderLayout scenes = layout.createFolder("scenes", IPageLayout.BOTTOM, 0.25f, editorArea);
 		scenes.addPlaceholder(NavigationView.ID+ ":*");
 		scenes.addView(NavigationView.ID);
 		

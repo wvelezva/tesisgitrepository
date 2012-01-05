@@ -145,6 +145,8 @@ public class Overlay extends Window {
 	}
 
 	public void setCurrentFrame(int currentFrame) {
+		if (UIActivator.getProject() == null)
+			System.out.println("el projecto es nulo");
 		animations = UIActivator.getProject().getVideo().getAnimationsByFrame(currentFrame);
 		this.currentFrame = currentFrame;  
 		this.repaint();

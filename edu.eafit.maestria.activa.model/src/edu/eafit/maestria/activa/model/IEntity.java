@@ -18,8 +18,8 @@ public interface IEntity {
 	public String getDescription();
 	public void setDescription(String description);
 	
-	public Map<String, String> getProperties();
-	public void setProperties(Map<String, String> properties);
+	public List<IProperty> getProperties();
+	public void setProperties(List<IProperty> properties);
 	
 	public List<ITaggedResource> getTaggedResources();
 	public void setTaggedResources(List<ITaggedResource> taggedResources);

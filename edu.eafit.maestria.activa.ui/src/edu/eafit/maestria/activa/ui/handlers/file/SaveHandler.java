@@ -4,10 +4,16 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import edu.eafit.maestria.activa.container.Container;
+import edu.eafit.maestria.activa.services.IEntityServices;
 import edu.eafit.maestria.activa.services.IProjectServices;
 import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.ui.player.Player;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class SaveHandler extends AbstractHandler implements IHandler {
@@ -16,8 +22,17 @@ public class SaveHandler extends AbstractHandler implements IHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
-		projectServices.saveProject(UIActivator.getProject());
+		if (UIActivator.getProject() != null) {
+			IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+			projectServices.saveProject(UIActivator.getProject());
+		}
+		
+		IEntityServices s = (IEntityServices) Container.getInstance().getComponent(IEntityServices.class);
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage page = window.getActivePage();
+		Player player = (Player) page.findView(Player.ID);
+		
+		s.save(player.getEntity());
 		return null;
 	}
 

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: acTiVa DAO
+Bundle-SymbolicName: edu.eafit.maestria.activa.dao.hibernate
+Bundle-Version: 0.0.1
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Activator: edu.eafit.maestria.activa.dao.hibernate.DAOActivator
+Require-Bundle: edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ edu.eafit.maestria.activa.model;bundle-version="0.0.1",
+ hibernate;bundle-version="1.0.0",
+ libs;bundle-version="1.0.0"
+Eclipse-RegisterBuddy: hibernate
+Export-Package: edu.eafit.maestria.activa.dao.hibernate,
+ edu.eafit.maestria.activa.dao.hibernate.utils

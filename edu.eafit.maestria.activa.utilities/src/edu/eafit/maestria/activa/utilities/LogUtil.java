@@ -107,6 +107,10 @@ public class LogUtil {
         logFatal(t.getMessage(), t);
     }
     
+    public void logFatal(String message) {
+        log(message, null, Status.CANCEL, Status.CANCEL);
+    }
+    
     private void log(String message, Throwable t, int serverity, int code) {
         logger.log(new Status(serverity, bundleID, code, "[" + clazz.getName() +"] " + message, t));
         

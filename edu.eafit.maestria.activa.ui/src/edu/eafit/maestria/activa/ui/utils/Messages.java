@@ -51,17 +51,18 @@ public class Messages extends NLS{
 	public static String PREFERENCES_GENERAL_ERROR_WORKSPACE_INVALID;
 	public static String COMMAND_FILE_NEW_SOURCE_VIDEO_BUTTON;
 
-
-
-
-
-
-
-
-
-
-
-
+	//Properties
+	public static String PROPERTIES_NAME;
+	public static String PROPERTIES_DESCRIPTION;
+	public static String PROPERTIES_TYPE;
+	public static String PROPERTIES_PROPERTIES;
+	public static String PROPERTIES_NEW_PROPERTY;
+	public static String PROPERTIES_DELETE_PROPERTY;
+	public static String PROPERTIES_NAME_COLUMN;
+	public static String PROPERTIES_VALUE_COLUMN;
+	public static String PROPERTIES_RESOURCES;
+	public static String PROPERTIES_NEW_RESOURCE;
+	public static String PROPERTIES_DELETE_RESOURCE;
 	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

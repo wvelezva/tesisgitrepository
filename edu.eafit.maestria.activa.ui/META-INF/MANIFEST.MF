@@ -10,9 +10,17 @@ Require-Bundle: org.eclipse.ui,
  edu.eafit.maestria.activa.model;bundle-version="0.0.1",
  libs;bundle-version="1.0.0",
  vlcj-bundle;bundle-version="1.2.1",
- edu.eafit.maestria.activa.container;bundle-version="0.0.1"
+ edu.eafit.maestria.activa.container;bundle-version="0.0.1",
+ org.eclipse.core.databinding;bundle-version="1.4.0",
+ org.eclipse.core.databinding.beans;bundle-version="1.2.100",
+ org.eclipse.jface.databinding;bundle-version="1.5.0",
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.jface.databinding,
+ org.eclipse.core.databinding.property;bundle-version="1.4.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: edu.eafit.maestria.activa.ui.UIActivator
 Bundle-ClassPath: .,
+ swing2swt.jar,
  swing2swt.jar

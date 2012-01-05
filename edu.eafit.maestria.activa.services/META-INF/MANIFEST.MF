@@ -6,7 +6,7 @@ Bundle-Version: 0.0.1
 Bundle-Activator: edu.eafit.maestria.activa.services.ServicesActivator
 Require-Bundle: org.eclipse.core.runtime,
  edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
- edu.eafit.maestria.activa.dao;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.dao.hibernate;bundle-version="0.0.1",
  edu.eafit.maestria.activa.model;bundle-version="0.0.1",
  xstream;bundle-version="1.4.2",
  libs;bundle-version="1.0.0"

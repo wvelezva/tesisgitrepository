@@ -70,6 +70,11 @@
             class="edu.eafit.maestria.activa.ui.NavigationView"
             id="activa.ui.navigationView">
       </view>
+      <view
+            class="PropertiesView"
+            id="PropertiesView"
+            name="Propertie">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.menus">

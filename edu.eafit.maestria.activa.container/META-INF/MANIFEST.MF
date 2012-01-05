@@ -7,7 +7,9 @@ Bundle-Activator: edu.eafit.maestria.activa.container.ContainerActivator
 Require-Bundle: org.eclipse.core.runtime,
  edu.eafit.maestria.activa.services;bundle-version="0.0.1",
  libs;bundle-version="1.0.0",
- edu.eafit.maestria.activa.utilities;bundle-version="0.0.1"
+ edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.dao.hibernate;bundle-version="0.0.1",
+ hibernate;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: edu.eafit.maestria.activa.container
