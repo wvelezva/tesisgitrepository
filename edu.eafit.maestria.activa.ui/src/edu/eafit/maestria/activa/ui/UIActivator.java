@@ -13,6 +13,8 @@ public class UIActivator extends AbstractUIPlugin {
 	// The shared instance.
     private static UIActivator plugin;
     
+    
+    
 	public UIActivator() {
 		 plugin = this;
 	}
