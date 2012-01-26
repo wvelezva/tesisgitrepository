@@ -39,6 +39,6 @@ public class Container extends DefaultPicoContainer{
 			.addComponent(EntityServicesImpl.class)
 			.addComponent(PropertyServicesImpl.class)
 			.addComponent(ResourceServicesImpl.class)
-			.addComponent(ProjectServicesImpl.getInstance());
+			.addComponent(ProjectServicesImpl.class);
 	}
 }

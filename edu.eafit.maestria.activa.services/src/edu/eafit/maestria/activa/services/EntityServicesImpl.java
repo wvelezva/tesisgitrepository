@@ -1,6 +1,9 @@
 package edu.eafit.maestria.activa.services;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.eafit.maestria.activa.dao.IEntityDao;
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
 
 public class EntityServicesImpl implements IEntityServices {
@@ -17,8 +20,29 @@ public class EntityServicesImpl implements IEntityServices {
 	}
 
 	@Override
+	public IEntity getById(long entityId){
+		return entityDao.getById(entityId);
+	}
+	
+	@Override
 	public void save(IEntity entity) {
+		if (entity == null || StringUtils.isBlank(entity.getName()) || entity.getType() == null)
+			return;
+		
 		entityDao.save(entity);
+	}
+
+	@Override
+	public IEntity getByAnimation(Animation animation) {
+		IEntity entity = animation.getEntity();
+		if (entity == null && animation.getEntityId() > 0) {
+			entity = entityDao.getById(animation.getEntityId());
+			animation.setEntity(entity);
+		} else if (entity == null){
+			entity = entityDao.newEntity();
+			animation.setEntity(entity);
+		}
+		return entity;
 	}
 
 }

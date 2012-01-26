@@ -24,6 +24,7 @@ public class DrawRectangleMouseAdapter extends ActivaMouseAdapter{
             Animation n = new Animation(overlay.getMouseRect(), overlay.getCurrentColor(), ShapeKind.RECTANGLE, overlay.getCurrentFrame());
             n.setSelected(true);
             overlay.add(n);
+            loadEntity();
 		}
 		overlay.getMouseRect().setBounds(0, 0, 0, 0);
 		overlay.repaint();

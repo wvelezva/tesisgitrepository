@@ -7,6 +7,7 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -15,13 +16,13 @@ import org.eclipse.jface.databinding.fieldassist.ControlDecorationSupport;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -38,7 +39,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.handlers.CollapseAllHandler;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.eafit.maestria.activa.model.IEntity;
@@ -58,12 +58,11 @@ public class Properties extends Composite {
 	private Text nameInput;
 	private Text descriptionInput;
 	private ComboViewer comboViewer;
-//	private Button newProperty;
 	private Button delProperty;
 	private TableViewer propertiesViewer;
-	private Button newResource;
 	private Button delResource;
 	private TableViewer resourcesViewer;
+	private DataBindingContext ctx;
 
 	/**
 	 * Create the composite.
@@ -75,10 +74,10 @@ public class Properties extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(3, false));
 		new Label(this, SWT.NONE);// to make the table structure valid
-		
 		createElements();
 		registerListeners();
-		
+		setEnabled(false);
+		ctx = new DataBindingContext();
 	}
 
 	private void createElements() {
@@ -141,11 +140,7 @@ public class Properties extends Composite {
 		
 		Label resources = new Label(this, SWT.NONE);
 		resources.setText(Messages.PROPERTIES_RESOURCES);
-		
-		newResource = new Button(this, SWT.NONE);
-		newResource.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		newResource.setText("+");
-		newResource.setToolTipText(Messages.PROPERTIES_NEW_RESOURCE);
+		new Label(this, SWT.NONE);
 		
 		delResource = new Button(this, SWT.NONE);
 		delResource.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -254,7 +249,6 @@ public class Properties extends Composite {
 	}
 
 	private void registerListeners(){
-//		newProperty.addSelectionListener(listener);
 		delProperty.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -277,7 +271,6 @@ public class Properties extends Composite {
 //			}
 //		});
 		
-//		newResource.addSelectionListener(listener);
 		delResource.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -317,10 +310,12 @@ public class Properties extends Composite {
 		}
 	}
 	
+	
 	private void bindValues(){
-		DataBindingContext ctx = new DataBindingContext();
+		ctx = new DataBindingContext();
 		//name
 		IObservableValue widgetValue = WidgetProperties.text(SWT.Modify).observe(nameInput);
+		
 		IObservableValue modelValue = BeanProperties.value(EntityWrapper.class,	"name").observe(entity);
 		IValidator validator = new IValidator() {
 			@Override
@@ -343,11 +338,20 @@ public class Properties extends Composite {
 		modelValue = BeanProperties.value(EntityWrapper.class,	"description").observe(entity);
 		ctx.bindValue(widgetValue, modelValue);
 	}
+
+	private void removeBindings() {
+		IObservableList observables = ctx.getBindings();
+		for (Object binding : observables) {
+			ctx.removeBinding((Binding)binding);
+		}
+	}
 	
 	public void setEntity(IEntity entity) {
+		//removeBindings();
+		ctx.dispose();
 		this.entity = new EntityWrapper(entity);
-		//TODO asi se selecciona el que corresponde al objeto seleccionado
-		//comboViewer.setSelection(new StructuredSelection(entity.getType()));
+		if (entity.getType() != null)
+			comboViewer.setSelection(new StructuredSelection(entity.getType()));
 		
 		propertiesViewer.setInput(this.entity.getProperties());
 		resourcesViewer.setInput(this.entity.getTaggedResources());
@@ -361,7 +365,12 @@ public class Properties extends Composite {
 	
 	public void setEnabled(boolean enabled){
 		if (!enabled) {
-			//TODO inicializar los campos nuevamente
+			if (ctx != null)
+				ctx.dispose();
+			nameInput.setText("");
+			descriptionInput.setText("");
+			propertiesViewer.getTable().clearAll();
+			resourcesViewer.getTable().clearAll();
 		}
 		super.setEnabled(enabled);
 	}

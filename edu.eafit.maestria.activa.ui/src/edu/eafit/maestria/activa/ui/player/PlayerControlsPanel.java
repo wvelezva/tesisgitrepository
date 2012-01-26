@@ -31,7 +31,7 @@ import edu.eafit.maestria.activa.ui.utils.Messages;
 
 public class PlayerControlsPanel extends Composite {
 
-	private static final int SKIP_TIME_MS = 10 * 1000;
+	private static final long SKIP_TIME_MS = 10 * 1000;
 
 	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -51,6 +51,7 @@ public class PlayerControlsPanel extends Composite {
 	private Button toggleMuteButton;
 	private Scale volumeScale;
 	private Button markSceneButton;
+	private Long currentFrame;
 
 	private boolean mousePressedPlaying = false;
 
@@ -199,12 +200,12 @@ public class PlayerControlsPanel extends Composite {
 	}
 
 	private void updateFrames(long time) {
-		double currentFrame = Math.floor((mediaPlayer.getFps()/1000)*time);
-		long frame = Double.valueOf(currentFrame).longValue();
-		frameLabel.setText(Long.toString(frame));
+		double frame = Math.ceil((mediaPlayer.getFps()/1000)*time);
+		currentFrame = Double.valueOf(frame).longValue();
+		frameLabel.setText(Long.toString(currentFrame));
 	}
 
-	private void skip(int skipTime) {
+	private void skip(long skipTime) {
 		// Only skip time if can handle time setting
 		if (mediaPlayer.getLength() > 0) {
 			mediaPlayer.skip(skipTime);
@@ -255,8 +256,19 @@ public class PlayerControlsPanel extends Composite {
 		previousFrameButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				double floor = Math.floor(1000/mediaPlayer.getFps());
-				skip(-Double.valueOf(floor).intValue());
+				if (currentFrame != null && currentFrame.longValue() > 0) {
+					
+					long frameLength = Double.valueOf(1000/mediaPlayer.getFps()).longValue();
+					long currentTime = mediaPlayer.getTime();
+					long previousFrame = 0;
+					long newTime = 0;
+					long count =1;
+					do {
+						newTime = currentTime - (frameLength*count++);
+						previousFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*newTime)).longValue();
+					} while (previousFrame >= currentFrame);
+					skip(-(currentTime - newTime));
+				}
 			}
 		});
 
@@ -294,11 +306,21 @@ public class PlayerControlsPanel extends Composite {
 		nextFrameButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				mediaPlayer.nextFrame();
-//				System.out.println("time:" +mediaPlayer.getTime());
-//				System.out.println("position:" + mediaPlayer.getPosition() * 1000.0f);
-//				System.out.println("frame:" + Math.floor((mediaPlayer.getFps()/1000)*mediaPlayer.getTime()));
-				updateUIState();
+				double frame = Math.ceil((mediaPlayer.getFps()/1000)*mediaPlayer.getTime());
+				currentFrame = Double.valueOf(frame).longValue();
+				if (currentFrame != null && currentFrame.longValue() < Math.ceil(mediaPlayer.getFps()/1000)*mediaPlayer.getLength()) {
+				
+					long frameLength = Double.valueOf(1000/mediaPlayer.getFps()).longValue();
+					long nextFrame = currentFrame + 1;
+					long newTime = currentFrame * frameLength;
+					long aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*newTime)).longValue();
+					while (aproxNextFrame < nextFrame) {
+						aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*++newTime)).longValue();
+					} 
+					mediaPlayer.setTime(newTime);
+					updateUIState();
+				}
+				
 			}
 		});
 
@@ -389,5 +411,9 @@ public class PlayerControlsPanel extends Composite {
 	public void pause(){
 		if (mediaPlayer.isPlaying())
 			tooglePlay(true);
+	}
+	
+	public Long getCurrentFrame(){
+		return currentFrame;
 	}
 }

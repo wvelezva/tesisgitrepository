@@ -91,6 +91,8 @@ public class Project implements Convertable {
 		return false;
 	}
 	
-	
+	@Override
+	public void setModified() {
+	}
 	
 }

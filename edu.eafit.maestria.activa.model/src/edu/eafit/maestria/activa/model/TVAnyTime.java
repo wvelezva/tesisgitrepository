@@ -33,4 +33,8 @@ public class TVAnyTime implements Convertable{
 		modified=false;
 	}
 
+	@Override
+	public void setModified() {
+		modified=true;		
+	}
 }

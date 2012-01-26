@@ -21,6 +21,10 @@ public class TaggedResource implements ITaggedResource
 	private IEntity entity;
 	private boolean archived;
 	
+	public TaggedResource(){
+		
+	}
+	
 	public TaggedResource(IResourceTag tag, IResource resource)
 	{
 		this.tag = tag;

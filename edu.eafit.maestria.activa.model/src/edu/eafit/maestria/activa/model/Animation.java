@@ -17,7 +17,11 @@ public class Animation {
         private ShapeKind kind;
         private int frameStart;
         private int frameEnd;
+        private long entityId;
 
+        @XStreamOmitField
+        private IEntity entity;
+        
         @XStreamImplicit
         private List<Shape> shape;
 
@@ -85,4 +89,26 @@ public class Animation {
 			this.kind = kind;
 		}
 
+		public IEntity getEntity() {
+			return entity;
+		}
+
+		public void setEntity(IEntity entity) {
+			this.entity = entity;
+			if (entity != null && entityId==0)
+				entityId=entity.getEntityId(); 
+		}
+
+		public long getEntityId() {
+			if (entity != null && entityId != entity.getEntityId())
+				 entityId = entity.getEntityId();
+			
+			return entityId;
+		}
+
+		public void setEntityId(long entityId) {
+			this.entityId = entityId;
+		}
+		
+		
     }

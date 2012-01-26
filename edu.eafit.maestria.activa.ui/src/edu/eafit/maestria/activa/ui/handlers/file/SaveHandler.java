@@ -27,12 +27,6 @@ public class SaveHandler extends AbstractHandler implements IHandler {
 			projectServices.saveProject(UIActivator.getProject());
 		}
 		
-		IEntityServices s = (IEntityServices) Container.getInstance().getComponent(IEntityServices.class);
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
-		Player player = (Player) page.findView(Player.ID);
-		
-		s.save(player.getEntity());
 		return null;
 	}
 

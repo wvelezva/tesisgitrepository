@@ -181,4 +181,26 @@ public class Video implements Convertable{
 		return totalFrames;
 	}
 	
+	public List<Animation> getAllAnimations(){
+		List<Animation> allAnimations = new ArrayList<Animation>();
+		
+		for (List<Animation> animationsByFrame : animations.values()) {
+			allAnimations.addAll(animationsByFrame);
+		}
+		
+		return allAnimations;
+	}
+
+	public void addAnimation(Integer currentFrame, Animation n) {
+		if (!animations.containsKey(currentFrame))
+			animations.put(currentFrame, new ArrayList<Animation>());
+		
+		animations.get(currentFrame).add(n);
+		modified=true;
+	}
+	
+	@Override
+	public void setModified() {
+		modified=true;		
+	}
 }

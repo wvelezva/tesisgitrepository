@@ -1,5 +1,6 @@
 package edu.eafit.maestria.activa.ui.handlers.file;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -42,10 +43,12 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 			dirDialog.setFilterPath(store.getString(Constants.Preferences.WORKSPACE));
 			String dirName = dirDialog.open();
 			
-			IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
-			Project project = projectServices.loadProject(dirName);
-			UIActivator.setProject(project);
-			ActivaPlayer.getInstance().prepareMedia(project.getVideo());
+			if (StringUtils.isNotBlank(dirName)) {
+				IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+				Project project = projectServices.loadProject(dirName);
+				UIActivator.setProject(project);
+				ActivaPlayer.getInstance().prepareMedia(project.getVideo());
+			}
 		}
 		
 		return null;

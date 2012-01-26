@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.Metadata;
 import edu.eafit.maestria.activa.model.ModelActivator;
 import edu.eafit.maestria.activa.model.PCF;
@@ -23,28 +24,14 @@ public class ProjectServicesImpl implements IProjectServices{
 
 	//private final LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName(), ProjectServicesImpl.class);
 	
-	private static ProjectServicesImpl projectServicesImpl;
-//	private IMetadataServices metadataServices;
-//	private IPCFServices pcfServices;
-//	private ITVAnyTimeServices tvaServices;
-//	private IVideoServices videoServices;
-	
 	private XStream xs;
+	private IEntityServices entityServices;
 	
-	private ProjectServicesImpl(){
+	public ProjectServicesImpl(IEntityServices entityServices){
 		xs = new XStream();
 		xs.processAnnotations(Project.class);
 		xs.setClassLoader(ModelActivator.class.getClassLoader());
-//		metadataServices = MetadataServicesImpl.getInstance();
-//		pcfServices = PCFServicesImpl.getInstance();
-//		tvaServices = TVAnyTimeServicesImpl.getInstance();
-//		videoServices = VideoServicesImpl.getInstance();
-	}
-	
-	public static IProjectServices getInstance(){
-		if (projectServicesImpl == null)
-			projectServicesImpl = new ProjectServicesImpl();
-		return projectServicesImpl;
+		this.entityServices = entityServices;
 	}
 	
 	public Project loadProject(String name){
@@ -62,6 +49,17 @@ public class ProjectServicesImpl implements IProjectServices{
 	}
 	
 	public boolean saveProject(Project project){
+		for (Animation animation : project.getVideo().getAllAnimations()) { 
+			if (animation != null && animation.getEntity() != null) {
+				long entityId = animation.getEntity().getEntityId();
+				entityServices.save(animation.getEntity());
+				if (entityId != animation.getEntityId()) {
+					animation.setEntityId(entityId);
+					project.getVideo().setModified();
+				}
+			}
+		}
+
 		if (project.isModified()){
 			//Write to a file in the file system
 			FileOutputStream fs = null;
@@ -80,6 +78,7 @@ public class ProjectServicesImpl implements IProjectServices{
 					}
 	        }
 		}
+		
         
         return true;
 	}
@@ -120,12 +119,6 @@ public class ProjectServicesImpl implements IProjectServices{
 		}
 		
 		return project;
-	}
-	
-	public static void main(String[] args){
-		IProjectServices ps = ProjectServicesImpl.getInstance();
-		Project pj = ps.loadProject("/Users/wvelezva/activa_projects/otra");
-		System.out.println(pj);
 	}
 	
 }

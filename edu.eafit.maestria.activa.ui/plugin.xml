@@ -35,11 +35,11 @@
          </property>
          <property
                name="startupMessageRect"
-               value="7,252,445,15">
+               value="7,430,400,15">
          </property>
          <property
                name="startupProgressRect"
-               value="5,275,445,5">
+               value="5,420,400,8">
          </property>
          <property
                name="preferenceCustomization"
@@ -997,6 +997,12 @@
             categoryId="activa.ui.category.player"
             defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.MoveHandler"
             id="activa.ui.command.player.move"
+            name="%command.player.move">
+      </command>
+       <command
+            categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.LoadEntityHandler"
+            id="activa.ui.command.player.loadEntity"
             name="%command.player.move">
       </command>
    </extension>

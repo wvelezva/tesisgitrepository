@@ -32,4 +32,9 @@ public class PCF implements Convertable{
 	public void resetModified(){
 		modified=false;
 	}
+	
+	@Override
+	public void setModified() {
+		modified=true;		
+	}
 }

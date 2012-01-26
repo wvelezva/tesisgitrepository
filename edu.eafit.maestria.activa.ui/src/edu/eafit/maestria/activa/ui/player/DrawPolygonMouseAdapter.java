@@ -39,6 +39,8 @@ public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
             overlay.add(n);
             
             overlay.setPolygon(new Polygon());
+            
+            loadEntity();
 		} else {
 			overlay.getPolygon().addPoint(e.getPoint().x, e.getPoint().y);
 		}

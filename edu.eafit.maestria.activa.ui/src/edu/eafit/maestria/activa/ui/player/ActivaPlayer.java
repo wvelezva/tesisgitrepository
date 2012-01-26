@@ -46,6 +46,7 @@ public class ActivaPlayer extends BaseVlcj {
 	private Video video;
 	private Frame videoFrame; 
 	private Canvas videoSurface;
+	private Player view;
 	
 	private static ActivaPlayer vlcjPlayer;
 	
@@ -59,7 +60,7 @@ public class ActivaPlayer extends BaseVlcj {
 		return vlcjPlayer;
 	}
 	
-	public void createUI(Composite parent){
+	public void createUI(Composite parent, Player view){
 		if (player == null) {
 //			
 			/*VLC Player*/
@@ -83,7 +84,7 @@ public class ActivaPlayer extends BaseVlcj {
 		    player.setEnableMouseInputHandling(false);
 		    
 		    controlsPanel = new PlayerControlsPanel(parent, player);
-		   
+		    this.view = view;
 		}
 	}
 
@@ -269,6 +270,7 @@ public class ActivaPlayer extends BaseVlcj {
 	public void enable(){
 		player.enableOverlay(true);
 		controlsPanel.setEnabled(true);
+		view.enableProperties(true);
 	}
 	
 	public void disable(){
@@ -278,6 +280,7 @@ public class ActivaPlayer extends BaseVlcj {
 		player.enableOverlay(false);
 		player.setOverlay(null);
 		controlsPanel.setEnabled(false);
+		view.enableProperties(false);
 	}
 		  
 	public void pause() {
@@ -298,10 +301,8 @@ public class ActivaPlayer extends BaseVlcj {
 				public void run() {
 //					if (player.isPlaying()) {
 					Overlay overlay = (Overlay)player.getOverlay();
-					if (overlay !=null) {
-						double currentFrame = Math.floor((player.getFps()/1000)*player.getTime());
-						int frame = Double.valueOf(currentFrame).intValue();
-						overlay.setCurrentFrame(frame);
+					if (overlay !=null && controlsPanel.getCurrentFrame() != null) {
+						overlay.setCurrentFrame(controlsPanel.getCurrentFrame().intValue());
 					}
 //					}
 				}

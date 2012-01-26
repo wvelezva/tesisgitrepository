@@ -21,8 +21,8 @@
 
    <splash
       location="edu.eafit.maestria.activa.ui"
-      startupProgressRect="5,275,445,5"
-      startupMessageRect="7,252,445,15"
+      startupProgressRect="5,420,400,8"
+      startupMessageRect="7,430,400,15"
       startupForegroundColor="4092FF" />
    <launcher name="acTiVa">
       <macosx icon="/edu.eafit.maestria.activa.ui/icons/app.icns"/>
@@ -32,10 +32,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>

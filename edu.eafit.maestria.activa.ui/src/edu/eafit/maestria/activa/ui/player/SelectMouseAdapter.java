@@ -9,6 +9,10 @@ public class SelectMouseAdapter extends ActivaMouseAdapter{
 	
 	private Overlay overlay;
 
+	public SelectMouseAdapter(){
+		
+	}
+	
 	public void setOverlay(Overlay overlay) {
 		this.overlay = overlay;
 	}
@@ -21,6 +25,8 @@ public class SelectMouseAdapter extends ActivaMouseAdapter{
 		if (e.isPopupTrigger()) {
 			overlay.showPopup(e.getComponent(), e.getX(), e.getY());
 		} 
+		
+		loadEntity();
 		
 		overlay.repaint();
 	}

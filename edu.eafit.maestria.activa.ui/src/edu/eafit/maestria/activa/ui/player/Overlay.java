@@ -161,8 +161,8 @@ public class Overlay extends Window {
 			animations = new ArrayList<Animation>();
 			UIActivator.getProject().getVideo().setAnimations(currentFrame, animations);
 		}
+		UIActivator.getProject().getVideo().addAnimation(currentFrame, n);
 		
-		animations.add(n);
 	}
 
 	private List<Animation> getAnimationsToPaint() {
