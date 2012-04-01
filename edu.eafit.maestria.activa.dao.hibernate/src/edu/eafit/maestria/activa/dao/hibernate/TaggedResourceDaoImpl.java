@@ -32,8 +32,6 @@ public class TaggedResourceDaoImpl extends BaseDaoHibernate<ITaggedResource> imp
 		TaggedResource taggedResource = new TaggedResource(resourceTag, resource, entity);
 		
 		entity.getTaggedResources().add(taggedResource);
-//		Entity entityImpl = (Entity) entity;
-//		entityImpl.getTaggedResources().add(taggedResource);
 		return taggedResource;
 	}
 }

@@ -118,14 +118,14 @@ public class EntityWrapper implements IEntity {
 	public void removeProperty(PropertyWrapper property) {
 		propertiesWrapped.remove(property);
 		this.entity.getProperties().remove(property.getWrappedProperty());
-		IPropertyServices propertyServices = (IPropertyServices)Container.getInstance().getComponent(IPropertyServices.class);
+		IPropertyServices propertyServices = (IPropertyServices)Container.get(IPropertyServices.class);
 		propertyServices.delete(property.getWrappedProperty());
 	}
 	
 	public void removeTaggedResource(TaggedResourceWrapper taggedResource) {
 		taggedResourcesWrapped.remove(taggedResource);
 		this.entity.getTaggedResources().remove(taggedResource.getWrappedTaggedResource());
-		IResourceServices resourceServices = (IResourceServices)Container.getInstance().getComponent(IResourceServices.class);
+		IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
 		resourceServices.deleteTaggedResource(taggedResource.getWrappedTaggedResource());
 	}
 

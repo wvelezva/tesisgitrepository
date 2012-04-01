@@ -3,8 +3,10 @@ package edu.eafit.maestria.activa.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -72,10 +74,13 @@ public class Video implements Convertable{
 		modified = true;
 		this.length = length;
 		updateTotalFrames();
+		Scene scene = getScenes().get(0);
+		scene.setStart(0);
+		scene.setEnd(totalFrames);
 	}
 	private void updateTotalFrames() {
 		if (fps > 0 && length > 0 && totalFrames == 0)
-			totalFrames = Double.valueOf(Math.floor(fps*(length/1000))).intValue();
+			totalFrames = Double.valueOf(Math.ceil(fps*(length/1000))).intValue();
 	}
 
 	public int getWidth() {
@@ -182,25 +187,80 @@ public class Video implements Convertable{
 	}
 	
 	public List<Animation> getAllAnimations(){
-		List<Animation> allAnimations = new ArrayList<Animation>();
+		Set<Animation> allAnimations = new HashSet<Animation>();
+		if (animations != null)
+			for (List<Animation> animationsByFrame : animations.values()) {
+				allAnimations.addAll(animationsByFrame);
+			}
 		
-		for (List<Animation> animationsByFrame : animations.values()) {
-			allAnimations.addAll(animationsByFrame);
-		}
-		
-		return allAnimations;
+		return new ArrayList<Animation>(allAnimations);
 	}
 
 	public void addAnimation(Integer currentFrame, Animation n) {
 		if (!animations.containsKey(currentFrame))
 			animations.put(currentFrame, new ArrayList<Animation>());
 		
-		animations.get(currentFrame).add(n);
+		if (!animations.get(currentFrame).contains(n))
+			animations.get(currentFrame).add(n);
+		modified=true;
+	}
+	
+	public void deleteAnimation(Integer currentFrame, Animation n) {
+		if (animations.containsKey(currentFrame))
+			animations.get(currentFrame).remove(n);
+		
 		modified=true;
 	}
 	
 	@Override
 	public void setModified() {
 		modified=true;		
+	}
+
+	/**
+	 * if the dstFrame is empty is will be filled with the animations of the srcframe 
+	 * @param srcFrame
+	 * @param dstFrame
+	 */
+	public void copyAnimations(int srcFrame, int dstFrame) {
+		if (srcFrame == dstFrame)
+			return;
+
+		if (animations.containsKey(dstFrame) && animations.get(dstFrame) != null && !animations.get(dstFrame).isEmpty())
+			return;
+		
+		List<Animation> srcAnimations = animations.get(srcFrame);
+		if (srcAnimations == null || srcAnimations.isEmpty())
+			return;
+		
+		List<Animation> dstAnimations = new ArrayList<Animation>();
+		dstAnimations.addAll(srcAnimations);
+		animations.put(dstFrame, dstAnimations);
+		boolean next = (dstFrame - srcFrame) > 0;
+		for (Animation animation : srcAnimations){
+			animation.cloneShape(next);
+		}
+				
+		modified = true;
+	}
+
+	public void deleteShape(int currentFrame, Animation animation) {
+		animation.deleteShape(currentFrame);
+		List<Animation> animationsByFrame = animations.get(currentFrame++);
+		while (animationsByFrame != null && !animationsByFrame.isEmpty()){
+			if (animationsByFrame.remove(animation))
+				animationsByFrame = animations.get(currentFrame++);
+			else
+				break;
+		}
+		modified = true;
+	}
+
+	public Scene getSceneByFrame(int frame){
+		for (Scene scene : scenes){
+			if (frame >= scene.getStart() && frame <= scene.getEnd())
+				return scene;
+		}
+		return null;
 	}
 }

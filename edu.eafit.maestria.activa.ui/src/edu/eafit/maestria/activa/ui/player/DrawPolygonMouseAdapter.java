@@ -10,6 +10,7 @@ import edu.eafit.maestria.activa.services.AnimationUtils;
 public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
 	
 	private Overlay overlay;
+	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();;
 	
 	
 	public void setOverlay(Overlay overlay) {
@@ -18,14 +19,14 @@ public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
 	
 	@Override
 	public void mouseClicked(MouseEvent e){
-		ActivaPlayer.getInstance().pause();
+		activaPlayer.pause();
 		
 		overlay.setMousePt(e.getPoint());
 		
 		if (e.isShiftDown()) {
-            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
         } else if (e.isPopupTrigger()) {
-			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
 			overlay.showPopup(e.getComponent(), e.getX(), e.getY());
 		} else {
             AnimationUtils.selectNone(overlay.getAnimations());
@@ -34,7 +35,7 @@ public class DrawPolygonMouseAdapter extends ActivaMouseAdapter{
 		if (isCompleted()) {
 			overlay.getPolygon().addPoint(overlay.getPolygon().xpoints[0], overlay.getPolygon().ypoints[0]);
 			AnimationUtils.selectNone(overlay.getAnimations());
-            Animation n = new Animation(overlay.getPolygon(), overlay.getCurrentColor(), ShapeKind.POLYGON, overlay.getCurrentFrame());
+            Animation n = new Animation(overlay.getPolygon(), overlay.getCurrentColor(), ShapeKind.POLYGON, activaPlayer.getCurrentFrame());
             n.setSelected(true);
             overlay.add(n);
             

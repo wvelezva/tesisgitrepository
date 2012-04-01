@@ -11,9 +11,9 @@ import org.apache.commons.lang.StringUtils;
 import com.thoughtworks.xstream.XStream;
 
 import edu.eafit.maestria.activa.model.Animation;
+import edu.eafit.maestria.activa.model.IEntity;
 import edu.eafit.maestria.activa.model.Metadata;
 import edu.eafit.maestria.activa.model.ModelActivator;
-import edu.eafit.maestria.activa.model.PCF;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.TVAnyTime;
@@ -51,10 +51,11 @@ public class ProjectServicesImpl implements IProjectServices{
 	public boolean saveProject(Project project){
 		for (Animation animation : project.getVideo().getAllAnimations()) { 
 			if (animation != null && animation.getEntity() != null) {
-				long entityId = animation.getEntity().getEntityId();
-				entityServices.save(animation.getEntity());
-				if (entityId != animation.getEntityId()) {
-					animation.setEntityId(entityId);
+				IEntity entity = animation.getEntity();
+				long entityId = entity.getEntityId();
+				entityServices.save(entity);
+				if (entityId != entity.getEntityId()) {
+					animation.setEntityId(entity.getEntityId());
 					project.getVideo().setModified();
 				}
 			}
@@ -97,10 +98,6 @@ public class ProjectServicesImpl implements IProjectServices{
 			Metadata metadata = new Metadata();
 			metadata.setSource(new File(projectDir, projectName + Constants.File.METADATA_FILE_EXTENSION));
 			project.setMetadata(metadata);
-			
-			PCF pcf= new PCF();
-			pcf.setSource(new File(projectDir, projectName + Constants.File.PCF_FILE_EXTENSION));
-			project.setPcf(pcf);
 			
 			TVAnyTime tva = new TVAnyTime();
 			tva.setSource(new File(projectDir, projectName + Constants.File.TVANYTIME_FILE_EXTENSION));

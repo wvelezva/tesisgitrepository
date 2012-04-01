@@ -15,10 +15,6 @@ package edu.eafit.maestria.activa.model;
 
 import edu.eafit.maestria.activa.utilities.Activator;
 
-
-/**
- * The main plugin class to be used in the desktop.
- */
 public class ModelActivator extends Activator {
 
     

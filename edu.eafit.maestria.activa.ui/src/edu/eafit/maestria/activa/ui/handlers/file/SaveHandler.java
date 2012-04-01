@@ -22,9 +22,9 @@ public class SaveHandler extends AbstractHandler implements IHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (UIActivator.getProject() != null) {
-			IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
-			projectServices.saveProject(UIActivator.getProject());
+		if (Container.getProject() != null) {
+			IProjectServices projectServices = (IProjectServices) Container.get(IProjectServices.class);
+			projectServices.saveProject(Container.getProject());
 		}
 		
 		return null;

@@ -6,7 +6,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.eafit.maestria.activa.ui.UIActivator;
-import edu.eafit.maestria.activa.ui.player.handlers.LoadEntityHandler;
+import edu.eafit.maestria.activa.ui.handlers.player.LoadEntityHandler;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public abstract class ActivaMouseAdapter extends MouseAdapter {

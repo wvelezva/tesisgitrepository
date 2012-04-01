@@ -7,6 +7,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.utilities.LogUtil;
@@ -28,7 +29,7 @@ public class CloseHandler extends AbstractHandler implements IHandler {
 		
 		if (saved) {
 			ActivaPlayer.getInstance().disable();
-			UIActivator.setProject(null);
+			Container.setProject(null);
 		}
 		return null;
 	}

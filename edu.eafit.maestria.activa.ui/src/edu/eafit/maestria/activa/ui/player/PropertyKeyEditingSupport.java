@@ -28,7 +28,7 @@ public class PropertyKeyEditingSupport extends EntityEditingSupport {
 				EntityWrapper entityWrapper = propertyWrapper.getEntityWrapper();
 				entityWrapper.getProperties().remove(propertyWrapper);
 				
-				IPropertyServices propertyServices = (IPropertyServices)Container.getInstance().getComponent(IPropertyServices.class);
+				IPropertyServices propertyServices = (IPropertyServices)Container.get(IPropertyServices.class);
 				IProperty property = propertyServices.addProperty((String)value, entityWrapper.getWrappedEntity());
 				PropertyWrapper newPropertyWrapper = new PropertyWrapper(property, entityWrapper);
 				

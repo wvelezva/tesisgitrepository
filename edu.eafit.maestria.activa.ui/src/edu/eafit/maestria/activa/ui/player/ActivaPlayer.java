@@ -2,16 +2,23 @@ package edu.eafit.maestria.activa.ui.player;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.RowData;
@@ -19,10 +26,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import uk.co.caprica.vlcj.player.AudioTrackInfo;
+import uk.co.caprica.vlcj.player.MediaDetails;
+import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.TrackInfo;
 import uk.co.caprica.vlcj.player.VideoTrackInfo;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.ui.UIActivator;
@@ -32,12 +43,10 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ActivaPlayer extends BaseVlcj {
 	
-	private static final int WIDTH = 810;
-	private static final int HEIGHT = 530;
-
 	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
 	
 	private ScheduledExecutorService executorService; 
+	private DecimalFormat snapshotNumberFormat;
 	
 	//private ActivaMediaPlayerFactory factory;
 	private MediaPlayerFactory factory;
@@ -48,9 +57,17 @@ public class ActivaPlayer extends BaseVlcj {
 	private Canvas videoSurface;
 	private Player view;
 	
+	private boolean correctionsCalculated;
+	private Dimension videoDimension;
+	private int correctionX;
+	private int correctionY;
+	private int maxWidth;
+	private int maxHeight;
+	
 	private static ActivaPlayer vlcjPlayer;
 	
 	private ActivaPlayer(){
+		snapshotNumberFormat = new DecimalFormat(Constants.File.SNAPSHOT_FILE_NAME_FORMAT);
 	}
 	
 	public static ActivaPlayer getInstance() {
@@ -65,17 +82,17 @@ public class ActivaPlayer extends BaseVlcj {
 //			
 			/*VLC Player*/
 			Composite videoComposite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE );
-			videoComposite.setLayoutData(new RowData(WIDTH,HEIGHT));
+			videoComposite.setLayoutData(new RowData(Constants.Player.WIDTH,Constants.Player.HEIGHT));
 			videoComposite.setVisible(true);
 
 			videoSurface = new Canvas();
 			videoSurface.setBackground(Color.black);
-			videoSurface.setSize(WIDTH, HEIGHT);
+			videoSurface.setSize(Constants.Player.WIDTH, Constants.Player.HEIGHT);
 			
 			videoFrame = SWT_AWT.new_Frame(videoComposite);
 			videoFrame.add(videoSurface);
-			vlcArgs.add("--width=" + WIDTH);
-		    vlcArgs.add("--height=" + HEIGHT);
+			vlcArgs.add("--width=" + Constants.Player.WIDTH);
+		    vlcArgs.add("--height=" + Constants.Player.HEIGHT);
 		    factory = new ActivaMediaPlayerFactory(vlcArgs);
 			player = factory.newEmbeddedMediaPlayer();
 			player.setVideoSurface(factory.newVideoSurface(videoSurface));
@@ -91,7 +108,7 @@ public class ActivaPlayer extends BaseVlcj {
 	private void setOverlay() {
 		videoSurface.addMouseListener(new DrawRectangleMouseAdapter());
 		videoSurface.addMouseMotionListener(new DrawRectangleMouseMotionAdapter());
-		player.setOverlay( new Overlay(videoFrame));
+		player.setOverlay(new Overlay(videoFrame));
 	    player.enableOverlay(true);
 	    
 	    long period = 0;
@@ -166,60 +183,81 @@ public class ActivaPlayer extends BaseVlcj {
 	 * @param video
 	 * @return
 	 */
-	public boolean prepareNewMedia(Video video) {
-		prepareMedia(video);
-		//corriendo el ejemplo mediainfotest se obtiene una salida que se puede parsear y obtener algunos datos
-		//este es un ejemplo de la salida
-		//mediaPlayer.getTrackInfo()
-		//Track Information before end: [VideoTrackInfo[codec=1986490477,codecName=vgpm,id=0,profile=-1,level=-1][width=0,height=0], AudioTrackInfo[codec=1634168941,codecName=agpm,id=1,profile=-1,level=-1][channels=0,rate=0], VideoTrackInfo[codec=1986490477,codecName=vgpm,id=2,profile=-1,level=-1][width=0,height=0]]
-		//se deberia de lanzar un hilo para esperar esta salida por que no siempre esta disponible inmediatamente
-
-		List<TrackInfo> trackInfos = player.getTrackInfo();
-		for (TrackInfo trackInfo : trackInfos) {
-			if (trackInfo instanceof VideoTrackInfo) { 
-				VideoTrackInfo vti = (VideoTrackInfo) trackInfo;
-				video.setVideoCodec(vti.codecName());
-				video.setWidth(vti.width());
-				video.setHeight(vti.height());
-			}
-			else if (trackInfo instanceof AudioTrackInfo) {
-				AudioTrackInfo ati = (AudioTrackInfo) trackInfo;
-				video.setAudioCodec(ati.codecName());
-				//video.setAudioInfo(ati.);
-			}
-		}
-
-		video.setLength(player.getLength());
-		video.setFps(player.getFps());
-		Scene scene = video.getScenes().get(0);
-		scene.setEnd(player.getLength());
+	public boolean prepareNewMedia(final Video video) {
+		this.video=video;
+//		if (!player.startMedia(video.getVideo().getAbsolutePath())) {
+//			logger.logError("The media doesn't start");
+//			return false;
+//		}
+		player.prepareMedia(this.video.getVideo().getAbsolutePath());
+		//player.parseMedia();
 		
-		saveSnapshot(scene);
+		
+		MediaPlayerEventAdapter mediaPlayerEventAdapter = new MediaPlayerEventAdapter() {
+				@Override
+				public void playing(MediaPlayer mediaPlayer) {
+					//TODO otro que hay que ensayar para sacar meta info del video
+					MediaDetails mediaDetails = player.getMediaDetails();
+					
+					//corriendo el ejemplo mediainfotest se obtiene una salida que se puede parsear y obtener algunos datos
+					//este es un ejemplo de la salida
+					//mediaPlayer.getTrackInfo()
+					//Track Information before end: [VideoTrackInfo[codec=1986490477,codecName=vgpm,id=0,profile=-1,level=-1][width=0,height=0], AudioTrackInfo[codec=1634168941,codecName=agpm,id=1,profile=-1,level=-1][channels=0,rate=0], VideoTrackInfo[codec=1986490477,codecName=vgpm,id=2,profile=-1,level=-1][width=0,height=0]]
+					//se deberia de lanzar un hilo para esperar esta salida por que no siempre esta disponible inmediatamente
+					List<TrackInfo> trackInfos = player.getTrackInfo();
+					for (TrackInfo trackInfo : trackInfos) {
+						if (trackInfo instanceof VideoTrackInfo) { 
+							VideoTrackInfo vti = (VideoTrackInfo) trackInfo;
+							video.setVideoCodec(vti.codecName());
+							video.setWidth(vti.width());
+							video.setHeight(vti.height());
+						}
+						else if (trackInfo instanceof AudioTrackInfo) {
+							AudioTrackInfo ati = (AudioTrackInfo) trackInfo;
+							video.setAudioCodec(ati.codecName());
+							//video.setAudioInfo(ati.);
+						}
+					}
+
+					//System.out.println(player.getSnapshot());
+					//System.out.println(player.getVideoSurfaceContents());
+					//System.out.println(player.getVideoDimension());
+					
+					
+					video.setLength(player.getLength());
+					video.setFps(player.getFps());
+					
+					saveSnapshot(video.getScenes().get(0));
+					player.stop();
+					player.removeMediaPlayerEventListener(this);
+				}
+			};
+		
+		player.addMediaPlayerEventListener(mediaPlayerEventAdapter);
+		
+		player.play();
+		
+		//saveSnapshot(video.getScenes().get(0));
+		//player.setTime(0);
+//		player.pause();
 		
 		setOverlay();
+		enable();
+		correctionsCalculated = false;
 		return true;
 	}
 
 	public boolean prepareMedia(Video video) {
 		this.video = video;
-//		player.prepareMedia(video.getVideo().getAbsolutePath());
-//		player.parseMedia();
-//		player.play();
-		player.playMedia(video.getVideo().getAbsolutePath());
-		try {
-		    // Half a second probably gets an iframe
-		    Thread.sleep(500);  
-	    } 
-	    catch(InterruptedException e) {
-		    // Don't care if unblocked early
-	    }
-		player.pause();
-		enable();
+		player.prepareMedia(video.getVideo().getAbsolutePath());
+		
 		setOverlay();
-        return true;
+		enable();
+		correctionsCalculated = false;
+		return true;
 	}
 	
-	private void saveSnapshot(long scene) {
+	public void saveSnapshot(long scene) {
 		if (player == null || video == null || video.getSnapshotDirectory() == null) {
 			logger.logWarning("player not initialized");
 			return;
@@ -229,16 +267,16 @@ public class ActivaPlayer extends BaseVlcj {
 			java.text.DecimalFormat snapshotNumberFormat = new java.text.DecimalFormat(Constants.File.SNAPSHOT_FILE_NAME_FORMAT);
 			String id = snapshotNumberFormat.format(scene);
 			player.saveSnapshot(new File(video.getSnapshotDirectory(), id + Constants.File.SNAPSHOT_FILE_EXTENSION));
-			player.saveSnapshot(new File(video.getSnapshotDirectory(), Constants.File.THUMBNAIL + id + Constants.File.SNAPSHOT_FILE_EXTENSION), 100, 0);
+			player.saveSnapshot(new File(video.getSnapshotDirectory(), id + Constants.File.THUMBNAIL + Constants.File.SNAPSHOT_FILE_EXTENSION), 100, 0);
 		} catch (Exception e) {
 			logger.logWarning(Messages.SAVE_SNAPSHOT_ERROR, e);
 		}
 	}
 	
-	private void saveSnapshot(Scene scene) {
+	public boolean saveSnapshot(Scene scene) {
 		if (player == null || video == null || video.getSnapshotDirectory() == null) {
 			logger.logWarning("player not initialized");
-			return;
+			return false;
 		}
 		
 //		En el ejemplo snapshottest hacen esto para tomar el snapshot, van a una posicion y duermen
@@ -247,24 +285,29 @@ public class ActivaPlayer extends BaseVlcj {
 //	    Thread.sleep(1000)
 //		tambien muestran un bufferedimage demas que se puede usar para la linea de tiempo
 	    
-		player.setPosition(0.25f);
+//		player.setPosition(0.25f);
 //	    mediaPlayer.setPosition(0.25f);
 		
 		try {
-			java.text.DecimalFormat snapshotNumberFormat = new java.text.DecimalFormat(Constants.File.SNAPSHOT_FILE_NAME_FORMAT);
+			
 			String id = snapshotNumberFormat.format(scene.getId());
 			
 			File snapshot = new File(video.getSnapshotDirectory(), id + Constants.File.SNAPSHOT_FILE_EXTENSION);
-			if (player.saveSnapshot(snapshot))
+			if (player.saveSnapshot(snapshot)) {
 				scene.setScene(snapshot);
-				
-			File thumbnail = new File(video.getSnapshotDirectory(), Constants.File.THUMBNAIL + id + Constants.File.SNAPSHOT_FILE_EXTENSION);
-			if (player.saveSnapshot(thumbnail, 100, 50)) {
-				scene.setThumbnail(thumbnail);
+					
+				File thumbnail = new File(video.getSnapshotDirectory(), id + Constants.File.THUMBNAIL + Constants.File.SNAPSHOT_FILE_EXTENSION);
+				if (player.saveSnapshot(thumbnail, Constants.Player.THUMBNAIL_WIDTH, 0)) {
+					scene.setThumbnail(thumbnail);
+					return true;
+				}
 			}
+			
+			
 		} catch (Exception e) {
 			logger.logWarning(Messages.SAVE_SNAPSHOT_ERROR, e);
 		}
+		return false;
 	}
 	
 	public void enable(){
@@ -292,22 +335,140 @@ public class ActivaPlayer extends BaseVlcj {
 		});
 	}
 	
+	
+	private int lastFrame=0;
+	
 	private final class UpdateOverlay implements Runnable {
 
 		@Override
 		public void run() {
-			Display.getDefault().asyncExec(new Runnable() {
+			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-//					if (player.isPlaying()) {
 					Overlay overlay = (Overlay)player.getOverlay();
 					if (overlay !=null && controlsPanel.getCurrentFrame() != null) {
-						overlay.setCurrentFrame(controlsPanel.getCurrentFrame().intValue());
+						
+						if (controlsPanel.isFrameByFrame()) {
+							if (overlay.getAnimations() != null && !overlay.getAnimations().isEmpty()) {
+								List<Animation> nextAnimations = video.getAnimationsByFrame(controlsPanel.getCurrentFrame().intValue());
+								if (nextAnimations == null || nextAnimations.isEmpty())
+									if (MessageDialog.openQuestion(view.getSite().getShell(), "Question", "Do you want to copy the shapes from the last frame?" + lastFrame + "-" + controlsPanel.getCurrentFrame().intValue()))
+										video.copyAnimations(lastFrame, controlsPanel.getCurrentFrame().intValue());
+							}
+							
+							overlay.setCurrentFrame(controlsPanel.getCurrentFrame().intValue());
+							lastFrame = controlsPanel.getCurrentFrame().intValue();
+							controlsPanel.resetFrameByFrame();
+						} else {
+							overlay.setCurrentFrame(controlsPanel.getCurrentFrame().intValue());
+							lastFrame = controlsPanel.getCurrentFrame().intValue();
+						}
 					}
-//					}
 				}
 			});
 		}
+	}
+	
+	public int getCurrentFrame(){
+		if (controlsPanel != null && controlsPanel.getCurrentFrame() != null)
+			return controlsPanel.getCurrentFrame().intValue();
+		
+		return -1;
+	}
+	
+	public long getCurrentTime(){
+		if (player != null)
+			return player.getTime();
+		
+		return -1;
+	}
+	
+//	public BufferedImage getSnapshot(){
+//		if (player != null)
+//			return player.getSnapshot();
+//		
+//		return null;
+//	}
+	
+	public BufferedImage getTemplate(Rectangle rectangle, File outputfile) {
+		Rectangle fixed = fix(rectangle);
+		BufferedImage template = null;
+		try {
+			BufferedImage snapshot = player.getSnapshot();
+			if (snapshot == null) {
+				logger.logError("Snapshot not taken");
+				return null;
+			}
+			template = snapshot.getSubimage(fixed.x, fixed.y, fixed.width, fixed.height);
+			
+			if (outputfile != null)
+				ImageIO.write(template, "jpg", outputfile);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return template;
+	}
+
+	public BufferedImage getTemplate(Rectangle rectangle){
+		return getTemplate(rectangle, null);
+	}
+			
+	private Rectangle fix(Rectangle rectangle) {
+		return new Rectangle(adjustXToVideo(rectangle.x), 
+				adjustYToVideo(rectangle.y), 
+				adjustXToVideoNoCorrection(rectangle.width), 
+				adjustYToVideoNoCorrection(rectangle.height));
+	}
+	
+	private void calculateCorrections(){
+		if (correctionsCalculated)
+			return;
+		
+		correctionsCalculated = true;
+		videoDimension= player.getVideoDimension();
+		double aspectRatio = (double)videoDimension.width/videoDimension.height;
+		
+		maxWidth = Constants.Player.WIDTH;
+		maxHeight = Constants.Player.HEIGHT;
+		
+		if (((double)Constants.Player.WIDTH / Constants.Player.HEIGHT) > aspectRatio)
+			maxWidth = (int) Math.ceil(maxHeight * aspectRatio);
+		else
+			maxHeight = (int) Math.ceil(maxWidth / aspectRatio);
+		
+		correctionX = (Constants.Player.WIDTH - maxWidth)/2;
+		correctionY = (Constants.Player.HEIGHT- maxHeight)/2;
+	}
+	
+	public int adjustXToVideo(int x){
+		calculateCorrections();
+		return (int)(x - correctionX) * videoDimension.width/maxWidth;
+	}
+	
+	public int adjustXToVideoNoCorrection(int x){
+		calculateCorrections();
+		return x * videoDimension.width/maxWidth;
+	}
+
+	public int adjustYToVideoNoCorrection(int y){
+		calculateCorrections();
+		return y * videoDimension.height/maxHeight;
+	}
+	
+	public int adjustVideoToX(int x){
+		calculateCorrections();
+		return  (x * maxWidth/ videoDimension.width) + correctionX; 
+	}
+	
+	public int adjustYToVideo(int y){
+		calculateCorrections();
+		return (int)(y - correctionY) * videoDimension.height/maxHeight;
+	}
+
+	public int adjustVideoToY(int y){
+		calculateCorrections();
+		return  (y * maxHeight/ videoDimension.height) + correctionY; 
 	}
 	
 	
@@ -315,29 +476,14 @@ public class ActivaPlayer extends BaseVlcj {
 //		player.addMediaOptions(paramArrayOfString);
 //		player.setStandardMediaOptions(options);
 //		System.out.println("aspect ratio: " + player.getAspectRatio());
-//		System.out.println("frames por segundo:" + player.getFps());
-//		System.out.println("length in ms:" + player.getLength());
-//		System.out.println("movie position (en que medida?):" + player.getPosition());
 //		System.out.println("scaling factor:" + player.getScale());
-//		System.out.println("current time:" + player.getTime());
 //				
 //		System.out.println("snapshot" + player.getSnapshot());
 //		//las medidas del snapshot thumbnail dependen del aspect ratio del video
 //		//pueder p.e.: la mitad de la altura y la mitad del ancho
 //		System.out.println("snapshot con tamano:" + player.getSnapshot(100, 100));
-//		System.out.println("guarda el snapshot:" + player.saveSnapshot());
-//		System.out.println("guarda el snapshot con tamano:" + player.saveSnapshot(100, 100));
-//		System.out.println("guarda el snapshot en file:" + player.saveSnapshot(new File("")));
-//		System.out.println("guarda el snapshot en file con un tamano:" + player.saveSnapshot(new File(""), 100, 100));
-//		System.out.println("is mute:" + player.isMute());
-//		System.out.println("is playable:" + player.isPlayable());
-//		System.out.println("is playing:" + player.isPlaying());
-//		System.out.println("is seekable:" + player.isSeekable());
 //		player.skipPosition(14f); //salta a la posicion actual + 14 en no se que unidades
 //		player.skip(199); //salta al tiempo actual + 199 ms
 //		player.setPosition(14f); //salta a la posicion 14
-//		player.setTime(199); //salta al tiempo 199
 //		System.out.println("dimension :" +player.getVideoDimension());
-//		player.nextFrame();
-//		player.setOverlay(Window.get);
 }

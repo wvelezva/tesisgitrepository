@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PCF UI
+Bundle-SymbolicName: edu.eafit.maestria.activa.pcf.ui;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.eafit.maestria.activa.pcf.ui.PCFUIActivator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ edu.eafit.maestria.activa.container;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.model;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ libs;bundle-version="1.0.0",
+ edu.eafit.maestria.activa.pcf;bundle-version="0.0.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

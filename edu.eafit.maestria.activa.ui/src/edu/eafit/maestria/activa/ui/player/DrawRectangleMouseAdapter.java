@@ -9,6 +9,7 @@ import edu.eafit.maestria.activa.services.AnimationUtils;
 public class DrawRectangleMouseAdapter extends ActivaMouseAdapter{
 	
 	private Overlay overlay;
+	private ActivaPlayer activaPlayer= ActivaPlayer.getInstance();
 
 	public void setOverlay(Overlay overlay) {
 		this.overlay = overlay;
@@ -21,7 +22,7 @@ public class DrawRectangleMouseAdapter extends ActivaMouseAdapter{
 			showPopup(e);
 		} else {
 			AnimationUtils.selectNone(overlay.getAnimations());
-            Animation n = new Animation(overlay.getMouseRect(), overlay.getCurrentColor(), ShapeKind.RECTANGLE, overlay.getCurrentFrame());
+            Animation n = new Animation(overlay.getMouseRect(), overlay.getCurrentColor(), ShapeKind.RECTANGLE, activaPlayer.getCurrentFrame());
             n.setSelected(true);
             overlay.add(n);
             loadEntity();
@@ -32,13 +33,14 @@ public class DrawRectangleMouseAdapter extends ActivaMouseAdapter{
 
 	@Override
 	public void mousePressed(MouseEvent e){
-		ActivaPlayer.getInstance().pause();
+		
+		activaPlayer.pause();
 		
 		overlay.setMousePt(e.getPoint());
 		if (e.isShiftDown()) {
-            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
         } else if (e.isPopupTrigger()) {
-			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
 			showPopup(e);
 		} else {
             AnimationUtils.selectNone(overlay.getAnimations());

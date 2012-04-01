@@ -43,7 +43,7 @@ public class ResourceEditingSupport extends EditingSupport {
 	protected void setValue(Object element, Object value) {
 		TaggedResourceWrapper taggedResourceWrapper = (TaggedResourceWrapper) element;
 		
-		IResourceServices resourceServices = (IResourceServices)Container.getInstance().getComponent(IResourceServices.class);
+		IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
 		File file = new File((String) value);
 		IResource resource = resourceServices.createResource(file);
 		

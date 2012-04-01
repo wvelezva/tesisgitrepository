@@ -28,7 +28,7 @@ public class TagEditingSupport extends EntityEditingSupport {
 				EntityWrapper entityWrapper = taggedResourceWrapper.getEntityWrapper();
 				entityWrapper.getTaggedResources().remove(taggedResourceWrapper);
 				
-				IResourceServices resourceServices = (IResourceServices)Container.getInstance().getComponent(IResourceServices.class);
+				IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
 				ITaggedResource taggedResource = resourceServices.addTaggedResource((String)value, entityWrapper.getWrappedEntity(), null);
 				TaggedResourceWrapper newTaggedResourceWrapper = new TaggedResourceWrapper(taggedResource, entityWrapper);
 				

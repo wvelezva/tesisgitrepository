@@ -12,7 +12,7 @@ public enum ModelProvider {
 	private List<IType> types;
 
 	private ModelProvider() {
-		ITypeServices typeServices = Container.getInstance().getComponent(ITypeServices.class);
+		ITypeServices typeServices = Container.get(ITypeServices.class);
 		types = typeServices.getTypes();
 	}
 

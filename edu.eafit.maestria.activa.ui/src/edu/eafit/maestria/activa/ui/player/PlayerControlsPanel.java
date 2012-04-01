@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.wb.swt.ResourceManager;
 
 import uk.co.caprica.vlcj.binding.LibVlcConst;
@@ -27,10 +29,15 @@ import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.ui.handlers.player.SaveSnapshotHandler;
 import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class PlayerControlsPanel extends Composite {
 
+	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), PlayerControlsPanel.class);
+	
+	private static final int VLC_OFFSET = 15;
 	private static final long SKIP_TIME_MS = 10 * 1000;
 
 	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -54,6 +61,7 @@ public class PlayerControlsPanel extends Composite {
 	private Long currentFrame;
 
 	private boolean mousePressedPlaying = false;
+	private boolean frameByFrame = false;
 
 	public PlayerControlsPanel(Composite parent, EmbeddedMediaPlayer mediaPlayer) {
 		super(parent, SWT.BORDER);
@@ -175,20 +183,6 @@ public class PlayerControlsPanel extends Composite {
 	}
 
 	private void updateUIState() {
-//		if (!mediaPlayer.isPlaying()) {
-//			// Resume play or play a few frames then pause to show current
-//			// position in video
-//			mediaPlayer.play();
-//			if (!mousePressedPlaying) {
-//				try {
-//					// Half a second probably gets an iframe
-//					Thread.sleep(500);
-//				} catch (InterruptedException e) {
-//					// Don't care if unblocked early
-//				}
-//				mediaPlayer.pause();
-//			}
-//		}
 		long time = mediaPlayer.getTime();
 		int position = (int) (mediaPlayer.getPosition() * 1000.0f);
 		int chapter = mediaPlayer.getChapter();
@@ -202,6 +196,7 @@ public class PlayerControlsPanel extends Composite {
 	private void updateFrames(long time) {
 		double frame = Math.ceil((mediaPlayer.getFps()/1000)*time);
 		currentFrame = Double.valueOf(frame).longValue();
+		
 		frameLabel.setText(Long.toString(currentFrame));
 	}
 
@@ -217,7 +212,7 @@ public class PlayerControlsPanel extends Composite {
 		mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 			@Override
 			public void playing(final MediaPlayer mediaPlayer) {
-				Display.getDefault().asyncExec(new Runnable () {
+				Display.getDefault().syncExec(new Runnable () {
 					@Override
 					public void run(){
 						volumeScale.setSelection(mediaPlayer.getVolume());
@@ -238,7 +233,6 @@ public class PlayerControlsPanel extends Composite {
 			public void mouseDown(MouseEvent e) {
 				if (mediaPlayer.isPlaying()) {
 					mousePressedPlaying = true;
-					mediaPlayer.pause();
 				} else {
 					mousePressedPlaying = false;
 				}
@@ -256,18 +250,27 @@ public class PlayerControlsPanel extends Composite {
 		previousFrameButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				pause();
+				double frame = Math.ceil((mediaPlayer.getFps()/1000)*mediaPlayer.getTime());
+				currentFrame = Double.valueOf(frame).longValue();
 				if (currentFrame != null && currentFrame.longValue() > 0) {
 					
 					long frameLength = Double.valueOf(1000/mediaPlayer.getFps()).longValue();
-					long currentTime = mediaPlayer.getTime();
 					long previousFrame = 0;
-					long newTime = 0;
-					long count =1;
+					long helperFrame = 0;
+					long newTime = mediaPlayer.getTime() - frameLength;
 					do {
-						newTime = currentTime - (frameLength*count++);
 						previousFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*newTime)).longValue();
-					} while (previousFrame >= currentFrame);
-					skip(-(currentTime - newTime));
+						helperFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*(newTime+VLC_OFFSET))).longValue();
+						if (previousFrame != helperFrame) {
+							newTime -= VLC_OFFSET;
+						} 
+						
+					} while (previousFrame >= currentFrame || helperFrame >= currentFrame);
+					//mediaPlayer.skip(-(mediaPlayer.getTime() - newTime)); 
+					mediaPlayer.setTime(newTime); 
+					updateUIState();
+					frameByFrame = true;
 				}
 			}
 		});
@@ -283,7 +286,6 @@ public class PlayerControlsPanel extends Composite {
 			@Override
 			public void handleEvent(Event event) {
 				mediaPlayer.stop();
-				//mediaPlayer.setPosition(0f);
 				updateUIState();
 				playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/play-48.png"));
 			}
@@ -306,6 +308,7 @@ public class PlayerControlsPanel extends Composite {
 		nextFrameButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				pause();
 				double frame = Math.ceil((mediaPlayer.getFps()/1000)*mediaPlayer.getTime());
 				currentFrame = Double.valueOf(frame).longValue();
 				if (currentFrame != null && currentFrame.longValue() < Math.ceil(mediaPlayer.getFps()/1000)*mediaPlayer.getLength()) {
@@ -319,8 +322,8 @@ public class PlayerControlsPanel extends Composite {
 					} 
 					mediaPlayer.setTime(newTime);
 					updateUIState();
+					frameByFrame = true;
 				}
-				
 			}
 		});
 
@@ -340,7 +343,13 @@ public class PlayerControlsPanel extends Composite {
 		markSceneButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				mediaPlayer.saveSnapshot();
+				try {
+					IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+					handlerService.executeCommand(SaveSnapshotHandler.commandId, null);
+				} catch (Exception ex) {
+					logger.logFatal(ex);
+					PlatformUI.getWorkbench().close();
+				}
 			}
 		});
 
@@ -356,24 +365,20 @@ public class PlayerControlsPanel extends Composite {
 
 		@Override
 		public void run() {
-			final long time = mediaPlayer.getTime();
-			
-			final int position = (int) (mediaPlayer.getPosition() * 1000.0f);
-			final int chapter = mediaPlayer.getChapter();
-			final int chapterCount = mediaPlayer.getChapterCount();
-
 			// Updates to user interface components must be executed on the
 			// Event
 			// Dispatch Thread
-			Display.getDefault().asyncExec(new Runnable() {
+			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (mediaPlayer.isPlaying()) {
-						updateTime(time);
-						updatePosition(position);
-						updateScene(chapter, chapterCount);
-						updateFrames(time);
-					}
+					long time = mediaPlayer.getTime();
+					int position = (int) (mediaPlayer.getPosition() * 1000.0f);
+					int chapter = mediaPlayer.getChapter();
+					int chapterCount = mediaPlayer.getChapterCount();
+					updateTime(time);
+					updatePosition(position);
+					updateScene(chapter, chapterCount);
+					updateFrames(time);
 				}
 			});
 		}
@@ -400,7 +405,6 @@ public class PlayerControlsPanel extends Composite {
 		if (isPlaying) {
 			mediaPlayer.pause();
 			playButton.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/play-48.png"));
-			updateUIState();
 		}
 		else {
 			mediaPlayer.play();
@@ -415,5 +419,13 @@ public class PlayerControlsPanel extends Composite {
 	
 	public Long getCurrentFrame(){
 		return currentFrame;
+	}
+	
+	public boolean isFrameByFrame(){
+		return frameByFrame;
+	}
+	
+	public void resetFrameByFrame(){
+		frameByFrame = false;
 	}
 }

@@ -11,8 +11,8 @@ public class Scene {
 	private long id;
 	private File scene;
 	private File thumbnail;
-	private long start;
-	private long end;
+	private int start; //frames
+	private int end;	//frames
 	
 	
 	public long getId() {
@@ -33,16 +33,16 @@ public class Scene {
 	public void setThumbnail(File thumbnail) {
 		this.thumbnail = thumbnail;
 	}
-	public long getStart() {
+	public int getStart() {
 		return start;
 	}
-	public void setStart(long start) {
+	public void setStart(int start) {
 		this.start = start;
 	}
-	public long getEnd() {
+	public int getEnd() {
 		return end;
 	}
-	public void setEnd(long end) {
+	public void setEnd(int end) {
 		this.end = end;
 	}
 	

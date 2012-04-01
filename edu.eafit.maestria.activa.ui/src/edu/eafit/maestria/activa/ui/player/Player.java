@@ -3,7 +3,6 @@ package edu.eafit.maestria.activa.ui.player;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.eafit.maestria.activa.container.Container;
@@ -51,8 +50,9 @@ public class Player extends ViewPart {
 	}
 	
 	public void loadEntity(Animation animation){
-		IEntity entity = ((IEntityServices)Container.getInstance().getComponent(IEntityServices.class)).getByAnimation(animation);
-		if (entity != null)
-			properties.setEntity(entity);
+		IEntity entity = ((IEntityServices)Container.get(IEntityServices.class)).getByAnimation(animation);
+		if (entity != null) {
+			properties.setEntity(animation);
+		}
 	}
 }

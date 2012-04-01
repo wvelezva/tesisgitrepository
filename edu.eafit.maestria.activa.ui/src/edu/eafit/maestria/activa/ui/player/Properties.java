@@ -1,5 +1,9 @@
 package edu.eafit.maestria.activa.ui.player;
 
+import java.awt.Shape;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,8 +31,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -41,17 +48,26 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import edu.eafit.maestria.activa.container.Container;
+import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
 import edu.eafit.maestria.activa.model.IResource;
 import edu.eafit.maestria.activa.model.ITaggedResource;
 import edu.eafit.maestria.activa.model.IType;
+import edu.eafit.maestria.activa.model.ResourceTag;
+import edu.eafit.maestria.activa.services.IEntityServices;
+import edu.eafit.maestria.activa.services.IResourceServices;
 import edu.eafit.maestria.activa.ui.model.EntityWrapper;
 import edu.eafit.maestria.activa.ui.model.ModelProvider;
 import edu.eafit.maestria.activa.ui.model.PropertyWrapper;
 import edu.eafit.maestria.activa.ui.model.TaggedResourceWrapper;
 import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.Constants;
 
 public class Properties extends Composite {
+	
+	private final DecimalFormat templateNumberFormat = new DecimalFormat(Constants.Template.TEMPLATE_FILE_NAME_FORMAT);
+	
 	private EntityWrapper entity;
 	
 	private Canvas thumbnail;
@@ -63,7 +79,8 @@ public class Properties extends Composite {
 	private Button delResource;
 	private TableViewer resourcesViewer;
 	private DataBindingContext ctx;
-
+	private IEntityServices entityServices;
+	
 	/**
 	 * Create the composite.
 	 * @param player 
@@ -78,15 +95,17 @@ public class Properties extends Composite {
 		registerListeners();
 		setEnabled(false);
 		ctx = new DataBindingContext();
+		entityServices = (IEntityServices) Container.get(IEntityServices.class);
 	}
 
 	private void createElements() {
-		thumbnail = new Canvas(this, SWT.NONE);
+		thumbnail = new Canvas(this, SWT.DEFAULT);
 		GridData gd_thumbnail = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_thumbnail.heightHint = 154;
 		gd_thumbnail.widthHint = 181;
 		thumbnail.setLayoutData(gd_thumbnail);
 		thumbnail.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_SELECTION));
+		
 		new Label(this, SWT.NONE);
 		
 		Label name = new Label(this, SWT.NONE);
@@ -257,20 +276,6 @@ public class Properties extends Composite {
 
 		});
 		
-		//TODO para volver a poner el keylistener hay que hacer mas bien el delete property en un command
-		//y ver como la tecla DEL que ya esta en el plugin.xml puede manejar 2 acciones dependiendo de lo que este
-		//seleccionado, o la ventana o el player, etc
-//		propertiesViewer.getTable().addKeyListener(new KeyAdapter() {
-//			
-//			@Override
-//			public void keyPressed(KeyEvent e) {
-//				if (e.keyCode == SWT.DEL) {
-//					deleteProperty();
-//				}
-//				
-//			}
-//		});
-		
 		delResource.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -346,10 +351,11 @@ public class Properties extends Composite {
 		}
 	}
 	
-	public void setEntity(IEntity entity) {
+	public void setEntity(Animation animation) {
 		//removeBindings();
 		ctx.dispose();
-		this.entity = new EntityWrapper(entity);
+		loadImage(animation);
+		entity = new EntityWrapper(animation.getEntity());
 		if (entity.getType() != null)
 			comboViewer.setSelection(new StructuredSelection(entity.getType()));
 		
@@ -359,6 +365,58 @@ public class Properties extends Composite {
 		bindValues();
 	}
 	
+	PaintListener paintListener = null; 
+	
+	private void loadImage(Animation animation) {
+		
+		IEntity entity = animation.getEntity();
+		File imgFile = getEntityImage(entity);
+		
+		if (imgFile == null  && entity.getEntityId() == 0) {
+			int currentFrame = ActivaPlayer.getInstance().getCurrentFrame();
+			Shape shape = animation.getShape(currentFrame);
+			String id = templateNumberFormat.format(currentFrame);
+			String fileName =  id + Constants.File.ENTITY;
+			try {
+				imgFile = File.createTempFile(fileName, Constants.Template.TEMPLATE_FILE_EXTENSION, Container.getProject().getVideo().getSnapshotDirectory());
+				ActivaPlayer.getInstance().getTemplate(shape.getBounds(), imgFile);
+				imgFile.deleteOnExit();
+				IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
+				
+				IResource resource = resourceServices.createResource(imgFile);
+				resourceServices.addTaggedResource(ResourceTag.ENTITY.toString(), entity, resource);
+				
+			} catch (IOException e) {		
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		} 
+		
+		if (imgFile != null) {
+			final Image img = new Image(this.getDisplay(), imgFile.getAbsolutePath());
+			if (paintListener != null)
+				thumbnail.removePaintListener(paintListener);
+			
+			paintListener = new PaintListener () {
+				public void paintControl(PaintEvent e) {
+					e.gc.drawImage(img, 0,0);
+				}
+			};
+			
+			thumbnail.addPaintListener(paintListener);
+			thumbnail.redraw();
+			
+		}
+	}
+
+	private File getEntityImage(IEntity entity) {
+		IResource image = entityServices.getEntityImage(entity);
+		if (image != null)
+			return image.getFile();
+		
+		return null;
+	}
+
 	public IEntity getEntity(){
 		return entity.getWrappedEntity();
 	}

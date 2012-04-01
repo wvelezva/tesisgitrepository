@@ -10,6 +10,7 @@ public class MoveMouseMotionAdapter extends ActivaMouseMotionAdapter{
 	 * 
 	 */
 	private Overlay overlay;
+	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
 
 	public void setOverlay(Overlay overlay) {
 		this.overlay = overlay;
@@ -20,7 +21,7 @@ public class MoveMouseMotionAdapter extends ActivaMouseMotionAdapter{
     @Override
     public void mouseDragged(MouseEvent e) {
     	delta.setLocation(e.getX() - overlay.getMousePt().x,e.getY() - overlay.getMousePt().y);
-        AnimationUtils.updatePosition(overlay.getAnimations(), delta, overlay.getCurrentFrame());
+        AnimationUtils.updatePosition(overlay.getAnimations(), delta, activaPlayer.getCurrentFrame());
         overlay.setMousePt(e.getPoint());
         
         overlay.repaint();

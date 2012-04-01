@@ -17,8 +17,8 @@ import javax.swing.JPopupMenu;
 
 import com.sun.awt.AWTUtilities;
 
+import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Animation;
-import edu.eafit.maestria.activa.ui.UIActivator;
 
 public class Overlay extends Window {
 
@@ -41,8 +41,8 @@ public class Overlay extends Window {
 	public Overlay(Window owner) {
 		super(owner);//, WindowUtils.getAlphaCompatibleGraphicsConfiguration());
 		AWTUtilities.setWindowOpaque(this, false);
-		//setBackground(Color.white);
-		//AWTUtilities.setWindowOpacity(this, 0.1f);
+//		setBackground(Color.blue);
+//		AWTUtilities.setWindowOpacity(this, 0.9f);
 		setLayout(null);
 		
 		
@@ -52,7 +52,7 @@ public class Overlay extends Window {
 	public void paint(Graphics g) {
 		super.paint(g);
 
-		if (UIActivator.getProject() == null)
+		if (Container.getProject() == null)
 			return;
 		
 		Graphics2D g2 = (Graphics2D) g;
@@ -145,23 +145,19 @@ public class Overlay extends Window {
 	}
 
 	public void setCurrentFrame(int currentFrame) {
-		if (UIActivator.getProject() == null)
-			System.out.println("el projecto es nulo");
-		animations = UIActivator.getProject().getVideo().getAnimationsByFrame(currentFrame);
+		if (Container.getProject() != null) {
+			animations = Container.getProject().getVideo().getAnimationsByFrame(currentFrame);
+		}
 		this.currentFrame = currentFrame;  
 		this.repaint();
 	}
 	
-	public int getCurrentFrame() {
-		return currentFrame;
-	}
-
 	public void add(Animation n) {
 		if (animations == null) {
 			animations = new ArrayList<Animation>();
-			UIActivator.getProject().getVideo().setAnimations(currentFrame, animations);
+			Container.getProject().getVideo().setAnimations(currentFrame, animations);
 		}
-		UIActivator.getProject().getVideo().addAnimation(currentFrame, n);
+		Container.getProject().getVideo().addAnimation(currentFrame, n);
 		
 	}
 
@@ -177,13 +173,13 @@ public class Overlay extends Window {
 		
 			end = currentFrame + 12;
 		
-			if (end > UIActivator.getProject().getVideo().getTotalFrames())
-				end = UIActivator.getProject().getVideo().getTotalFrames();
+			if (end > Container.getProject().getVideo().getTotalFrames())
+				end = Container.getProject().getVideo().getTotalFrames();
 		}*/
 		
-		if (UIActivator.getProject().getVideo().getAnimations() != null) {
+		if (Container.getProject().getVideo().getAnimations() != null) {
 			for (int i = init; i <= end; i ++){
-				List<Animation> animationsByFrame = UIActivator.getProject().getVideo().getAnimationsByFrame(i);
+				List<Animation> animationsByFrame = Container.getProject().getVideo().getAnimationsByFrame(i);
 				if (animationsByFrame != null)
 					animationsToPaint.addAll(animationsByFrame);
 			}

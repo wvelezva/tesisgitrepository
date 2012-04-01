@@ -70,11 +70,6 @@
             class="edu.eafit.maestria.activa.ui.NavigationView"
             id="activa.ui.navigationView">
       </view>
-      <view
-            class="PropertiesView"
-            id="PropertiesView"
-            name="Propertie">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -151,7 +146,7 @@
             </command>
             <command
                   commandId="activa.ui.command.edit.delete"
-            	  label="%command.edit.delete"
+                  label="%command.edit.delete"
                   style="push">
             </command>
             <separator
@@ -295,8 +290,8 @@
 						style="push">
 	              </command>
                   <command
-                        commandId="activa.ui.command.detect.track.particle"
-            			label="%command.detect.track.particle"
+                        commandId="activa.ui.command.detect.track.opticalFlow"
+            			label="%command.detect.track.opticalFlow"
             			style="push">
                   </command>
             </menu>
@@ -531,10 +526,10 @@
                tooltip="%command.detect.track.template">
          </command>
          <command
-               commandId="activa.ui.command.detect.track.particle"
-               label="%command.detect.track.particle"
+               commandId="activa.ui.command.detect.track.opticalFlow"
+               label="%command.detect.track.opticalFlow"
                style="push"
-               tooltip="%command.detect.track.particle">
+               tooltip="%command.detect.track.opticalFlow">
          </command>
       </menuContribution>
       <menuContribution
@@ -707,7 +702,7 @@
       </command>
       <command
       		categoryId="activa.ui.category.edit"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.edit.DeleteHandler"
             id="activa.ui.command.edit.delete"
             name="%command.edit.delete">
       </command>
@@ -858,15 +853,15 @@
       </category>
       <command
       		categoryId="activa.ui.category.detect.track"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.detect.TemplateMatchingHandler"
             id="activa.ui.command.detect.track.template"
             name="%command.detect.track.template">
       </command>
       <command
       		categoryId="activa.ui.category.detect.track"
-            defaultHandler="edu.eafit.maestria.activa.ui.handlers.NotImplementedHandler"
-            id="activa.ui.command.detect.track.particle"
-            name="%command.detect.track.particle">
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.detect.OpticalFlowHandler"
+            id="activa.ui.command.detect.track.opticalFlow"
+            name="%command.detect.track.opticalFlow">
       </command>
       <!-- Run Category -->
       <category
@@ -920,6 +915,7 @@
             id="activa.ui.command.run.generate.all"
             name="%command.run.generate.all">
       </command>
+     
       <!-- Help Category -->
       <category
             id="activa.ui.category.help"
@@ -960,19 +956,19 @@
       </category>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.DrawRectangleHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.DrawRectangleHandler"
             id="activa.ui.command.player.drawRectangle"
             name="%command.player.drawRectangle">
       </command>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.DrawPolygonHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.DrawPolygonHandler"
             id="activa.ui.command.player.drawPolygon"
             name="%command.player.drawPolygon">
       </command>
       <command
       		categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.SelectHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.SelectHandler"
             id="activa.ui.command.player.select"
             name="%command.player.select">
       </command>
@@ -983,8 +979,8 @@
             name="%command.player.selectWand">
       </command>
       <command
-            category="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.SetColorHandler"
+            categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.SetColorHandler"
             id="activa.ui.command.player.setColor"
             name="%command.player.setColor">
          <commandParameter
@@ -995,15 +991,21 @@
       </command>
       <command
             categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.MoveHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.MoveHandler"
             id="activa.ui.command.player.move"
             name="%command.player.move">
       </command>
        <command
             categoryId="activa.ui.category.player"
-            defaultHandler="edu.eafit.maestria.activa.ui.player.handlers.LoadEntityHandler"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.LoadEntityHandler"
             id="activa.ui.command.player.loadEntity"
-            name="%command.player.move">
+            name="%command.player.loadEntity">
+      </command>
+      <command
+            categoryId="activa.ui.category.player"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.player.SaveSnapshotHandler"
+            id="activa.ui.command.player.saveSnapshot"
+            name="%command.player.saveSnapshot">
       </command>
    </extension>
    
@@ -1013,7 +1015,7 @@
             name="name of context"
             description="description context"
             id="activa.context"
-            parentid="org.eclipse.ui.contexts.window">
+            parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
    
@@ -1192,7 +1194,7 @@
             sequence="M1+T">
       </key>
       <key
-            commandId="activa.ui.command.detect.track.particle"
+            commandId="activa.ui.command.detect.track.opticalFlow"
             schemeId="activa.ui.key.scheme"
             sequence="M1+P">
       </key>

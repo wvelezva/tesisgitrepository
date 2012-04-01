@@ -4,8 +4,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
-import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
-
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
@@ -15,8 +13,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void preWindowOpen() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         configurer.setInitialSize(new Point(1200, 1000));
-        //configurer.setShowCoolBar(true);
-        //configurer.setShowStatusLine(true);
+        configurer.setShowStatusLine(false);
         configurer.setShowProgressIndicator(true);
     }
     
@@ -25,8 +22,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     	return super.preWindowShellClose();
     }
     
-    public void dispose() {
-    	ActivaPlayer.getInstance().release();
-    }
+//    public void dispose() {
+//    	ActivaPlayer.getInstance().release();
+//    }
     
 }

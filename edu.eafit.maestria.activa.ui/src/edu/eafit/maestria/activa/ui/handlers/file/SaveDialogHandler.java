@@ -19,13 +19,13 @@ public class SaveDialogHandler extends AbstractHandler implements IHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		Project project = UIActivator.getProject();
+		Project project = Container.getProject();
 		if (project != null && project.isModified()) {
 			MessageDialog messageDialog = new MessageDialog(HandlerUtil.getActiveShell(event), "TEXTO PARA EL TITULO", null, Messages.COMMAND_FILE_SAVE_PROJECT_MSG, MessageDialog.QUESTION, 
 					new String[] { Messages.COMMAND_FILE_BUTTON_DONT_SAVE, Messages.COMMAND_FILE_BUTTON_CANCEL, Messages.COMMAND_FILE_BUTTON_SAVE }, 0);
 			int returnCode = messageDialog.open();
 			if  (returnCode == 2) {
-				IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+				IProjectServices projectServices = (IProjectServices) Container.get(IProjectServices.class);
 				projectServices.saveProject(project);
 			} else if (returnCode == 1) {
 				return Boolean.FALSE;

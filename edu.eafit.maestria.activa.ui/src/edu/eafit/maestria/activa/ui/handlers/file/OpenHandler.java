@@ -44,9 +44,9 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 			String dirName = dirDialog.open();
 			
 			if (StringUtils.isNotBlank(dirName)) {
-				IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+				IProjectServices projectServices = (IProjectServices) Container.get(IProjectServices.class);
 				Project project = projectServices.loadProject(dirName);
-				UIActivator.setProject(project);
+				Container.setProject(project);
 				ActivaPlayer.getInstance().prepareMedia(project.getVideo());
 			}
 		}

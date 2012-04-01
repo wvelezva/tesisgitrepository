@@ -1,0 +1,2 @@
+java.text.DecimalFormat nf = new java.text.DecimalFormat("00000");
+System.out.println(nf.format(1));

@@ -20,9 +20,6 @@ import edu.eafit.maestria.activa.utilities.Activator;
 
 
 
-/**
- * The main plugin class to be used in the desktop.
- */
 public class DAOActivator extends Activator {
 
 	@Override

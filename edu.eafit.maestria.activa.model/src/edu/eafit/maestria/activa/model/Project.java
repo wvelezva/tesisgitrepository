@@ -8,7 +8,6 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import edu.eafit.maestria.activa.model.converters.Convertable;
 import edu.eafit.maestria.activa.model.converters.MetadataToFileConverter;
-import edu.eafit.maestria.activa.model.converters.PCFToFileConverter;
 import edu.eafit.maestria.activa.model.converters.TVAnyTimeToFileConverter;
 import edu.eafit.maestria.activa.model.converters.VideoToFileConverter;
 
@@ -23,9 +22,6 @@ public class Project implements Convertable {
 	
 	@XStreamConverter(VideoToFileConverter.class)
 	private Video video;
-	
-	@XStreamConverter(PCFToFileConverter.class)
-	private PCF pcf;
 	
 	@XStreamConverter(TVAnyTimeToFileConverter.class)
 	private TVAnyTime tva;
@@ -57,12 +53,6 @@ public class Project implements Convertable {
 	public void setVideo(Video video) {
 		this.video = video;
 	}
-	public PCF getPcf() {
-		return pcf;
-	}
-	public void setPcf(PCF pcf) {
-		this.pcf = pcf;
-	}
 	public TVAnyTime getTva() {
 		return tva;
 	}
@@ -78,7 +68,7 @@ public class Project implements Convertable {
 	
 	@Override
 	public boolean isModified() {
-		return isModified(video) || isModified(pcf) || isModified(metadata) || isModified(tva);
+		return isModified(video) || isModified(metadata) || isModified(tva);
 	}
 	
 	@Override

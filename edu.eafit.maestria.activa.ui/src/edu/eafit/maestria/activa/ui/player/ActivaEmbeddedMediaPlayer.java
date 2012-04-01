@@ -163,7 +163,7 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	  
 	//  @Override
 	  public Window getOverlay() {
-	    Logger.debug("getOverlay()");
+	    //Logger.debug("getOverlay()");
 	    return overlay;
 	  }
 	  

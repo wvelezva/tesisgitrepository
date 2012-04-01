@@ -38,7 +38,7 @@ public class BaseDaoHibernate<T> {
 	/**
 	 * @return the persistentClass
 	 */
-	private Class getPersistentClass() {
+	private Class<? extends T> getPersistentClass() {
 		return persistentClass;
 	}
 	

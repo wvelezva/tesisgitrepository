@@ -39,7 +39,7 @@ public class NewWizard extends Wizard {
 		String projectName =  newWizardPage.getProjectName();
 		File projectDir = newWizardPage.getProjectLocation();
 		File sourceVideo = new File(newWizardPage.getSourceVideo());
-		IProjectServices projectServices = (IProjectServices) Container.getInstance().getComponent(IProjectServices.class);
+		IProjectServices projectServices = (IProjectServices) Container.get(IProjectServices.class);
 		Project project = projectServices.newProject(projectName, sourceVideo, projectDir);
 		if (project == null) {
 			try {
@@ -53,7 +53,7 @@ public class NewWizard extends Wizard {
 		
 		ActivaPlayer.getInstance().prepareNewMedia(project.getVideo());
 		projectServices.saveProject(project);
-		UIActivator.setProject(project);
+		Container.setProject(project);
 		
 		return true;
 	}

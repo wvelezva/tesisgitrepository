@@ -17,10 +17,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.databinding.beans,
  org.eclipse.jface.databinding,
  org.eclipse.core.databinding.property;bundle-version="1.4.0",
- vlcj-1.2.2;bundle-version="1.2.2"
+ vlcj-2.0.0;bundle-version="2.0.0",
+ javacv-20120108;bundle-version="1.0.0",
+ edu.eafit.maestria.activa.pcf.ui;bundle-version="0.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: edu.eafit.maestria.activa.ui.UIActivator
 Bundle-ClassPath: .,
  swing2swt.jar,
  swing2swt.jar
+Export-Package: edu.eafit.maestria.activa.ui

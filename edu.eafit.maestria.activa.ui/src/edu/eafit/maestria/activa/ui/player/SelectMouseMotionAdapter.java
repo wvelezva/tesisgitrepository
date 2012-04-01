@@ -13,6 +13,7 @@ public class SelectMouseMotionAdapter extends ActivaMouseMotionAdapter {
 	
 	private Overlay overlay;
 	private Point delta = new Point();
+	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
 
 	public void setOverlay(Overlay overlay) {
 		this.overlay = overlay;
@@ -26,12 +27,12 @@ public class SelectMouseMotionAdapter extends ActivaMouseMotionAdapter {
 					Math.min(overlay.getMousePt().y, e.getY()),
 					Math.abs(overlay.getMousePt().x - e.getX()),
 					Math.abs(overlay.getMousePt().y - e.getY()));
-			AnimationUtils.selectRect(overlay.getAnimations(), overlay.getMouseRect(), overlay.getCurrentFrame());
+			AnimationUtils.selectRect(overlay.getAnimations(), overlay.getMouseRect(), activaPlayer.getCurrentFrame());
 			
 			
 		} else {
 			delta.setLocation(e.getX() - overlay.getMousePt().x, e.getY() - overlay.getMousePt().y);
-			AnimationUtils.updatePosition(overlay.getAnimations(), delta, overlay.getCurrentFrame());
+			AnimationUtils.updatePosition(overlay.getAnimations(), delta, activaPlayer.getCurrentFrame());
 			overlay.setMousePt(e.getPoint());
 			loadEntity();
 		}

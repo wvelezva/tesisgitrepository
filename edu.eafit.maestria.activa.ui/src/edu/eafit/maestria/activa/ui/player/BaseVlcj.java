@@ -43,12 +43,12 @@ public abstract class BaseVlcj {
 	 * This is a bit more explicit than using the -Djna.library.path= system
 	 * property.
 	 */
-	private static final String NATIVE_LIBRARY_SEARCH_PATH = "/Users/wvelezva/Maestria/vlc-1.2.0/VLC.app/Contents/MacOS/lib/";
+	private static final String NATIVE_LIBRARY_SEARCH_PATH = "/Users/wvelezva/Maestria/vlc-2.1.0/VLC.app/Contents/MacOS/lib/";
 
 	/**
 	 * Set to true to dump out native JNA memory structures.
 	 */
-	private static final String DUMP_NATIVE_MEMORY = "false";
+	private static final String DUMP_NATIVE_MEMORY = "true";
 
 	protected static List<String> vlcArgs = new ArrayList<String>();
 	/**
@@ -72,6 +72,8 @@ public abstract class BaseVlcj {
 	    vlcArgs.add("--no-snapshot-preview");
 	    vlcArgs.add("--auto-preparse");
 	    vlcArgs.add("--intf");
+	    vlcArgs.add("--no-xlib");
+	    vlcArgs.add("--no-osd");
 
 	    if (!"DEBUG".equals(System.getProperty("vlcj.log")) && !"TRACE".equals(System.getProperty("vlcj.log"))) {
 		    vlcArgs.add("--quiet");

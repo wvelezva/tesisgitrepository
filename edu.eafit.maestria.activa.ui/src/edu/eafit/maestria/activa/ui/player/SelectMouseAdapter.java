@@ -8,6 +8,7 @@ import edu.eafit.maestria.activa.services.AnimationUtils;
 public class SelectMouseAdapter extends ActivaMouseAdapter{
 	
 	private Overlay overlay;
+	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
 
 	public SelectMouseAdapter(){
 		
@@ -33,15 +34,15 @@ public class SelectMouseAdapter extends ActivaMouseAdapter{
 
 	@Override
 	public void mousePressed(MouseEvent e){
-		ActivaPlayer.getInstance().pause();
+		activaPlayer.pause();
 		
 		overlay.setMousePt(e.getPoint());
 		if (e.isShiftDown()) {
-            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+            AnimationUtils.selectToggle(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
         } else if (e.isPopupTrigger()) {
-			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame());
+			AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame());
 			overlay.showPopup(e.getComponent(), e.getX(), e.getY());
-		} else if (AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), overlay.getCurrentFrame())) {
+		} else if (AnimationUtils.selectOne(overlay.getAnimations(), overlay.getMousePt(), activaPlayer.getCurrentFrame())) {
             overlay.setSelecting(false);
         } else {
             AnimationUtils.selectNone(overlay.getAnimations());

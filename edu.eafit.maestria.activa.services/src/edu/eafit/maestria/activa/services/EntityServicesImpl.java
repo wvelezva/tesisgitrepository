@@ -1,10 +1,15 @@
 package edu.eafit.maestria.activa.services;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 
 import edu.eafit.maestria.activa.dao.IEntityDao;
 import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
+import edu.eafit.maestria.activa.model.IResource;
+import edu.eafit.maestria.activa.model.ITaggedResource;
+import edu.eafit.maestria.activa.model.ResourceTag;
 
 public class EntityServicesImpl implements IEntityServices {
 
@@ -37,12 +42,22 @@ public class EntityServicesImpl implements IEntityServices {
 		IEntity entity = animation.getEntity();
 		if (entity == null && animation.getEntityId() > 0) {
 			entity = entityDao.getById(animation.getEntityId());
-			animation.setEntity(entity);
 		} else if (entity == null){
 			entity = entityDao.newEntity();
-			animation.setEntity(entity);
 		}
+		animation.setEntity(entity);
 		return entity;
+	}
+	
+	@Override
+	public IResource getEntityImage(IEntity entity) {
+		List<ITaggedResource> resources = entity.getTaggedResources();
+		for (ITaggedResource taggedResource : resources){
+			if (taggedResource.getTag() == ResourceTag.ENTITY) {
+				return taggedResource.getResource();
+			}
+		}
+		return null;
 	}
 
 }
