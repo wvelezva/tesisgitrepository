@@ -9,10 +9,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.IResource;
 import edu.eafit.maestria.activa.services.IResourceServices;
+import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.model.TaggedResourceWrapper;
+import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ResourceEditingSupport extends EditingSupport {
 
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
+	
 	protected final TableViewer viewer;
 	
 	public ResourceEditingSupport(TableViewer viewer) {
@@ -45,9 +50,13 @@ public class ResourceEditingSupport extends EditingSupport {
 		
 		IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
 		File file = new File((String) value);
-		IResource resource = resourceServices.createResource(file);
+		try {
+			IResource resource = resourceServices.createResource(file);
+			taggedResourceWrapper.setResource(resource);
+		} catch (Exception e) {
+			logger.error(e, Messages.PROPERTIES_COPYING_IMG_ERROR);
+		}
 		
-		taggedResourceWrapper.setResource(resource);
 		viewer.refresh();
 	}
 

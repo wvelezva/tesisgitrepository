@@ -10,6 +10,9 @@ public class Messages extends NLS{
 	//PCF
 	public static String PROPERTIES;
 	public static String RESOURCES;
+
+	public static String ERROR_EXPORTING_PCF;
+	public static String ERROR_EXPORTING_DETAIL_TEMPLATE;
 		
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

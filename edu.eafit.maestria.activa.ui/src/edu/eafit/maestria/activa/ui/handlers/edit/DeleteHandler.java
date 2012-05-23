@@ -11,15 +11,11 @@ import org.eclipse.core.commands.IHandler;
 import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.services.AnimationUtils;
-import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 import edu.eafit.maestria.activa.ui.player.Overlay;
-import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class DeleteHandler extends AbstractHandler implements IHandler {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), DeleteHandler.class);
-	
 	public static final String commandId = "activa.ui.command.player.delete";
 	
 	@Override

@@ -23,7 +23,7 @@ public abstract class ObjectToFileConverter implements Converter {
             FileInputStream fis = new FileInputStream(reader.getValue());
             getXStreamProcessor().fromXML(fis, convertable);
         } catch (FileNotFoundException e) {
-            getLogger().logError(e);
+            getLogger().error(e);
             return null;
         }
 		return convertable;
@@ -51,13 +51,13 @@ public abstract class ObjectToFileConverter implements Converter {
 	        	xs.toXML(convertable, fs);
 	        	convertable.resetModified();
 	        } catch (FileNotFoundException e) {
-	            getLogger().logError(e);
+	            getLogger().error(e);
 	        } finally {
 	        	if (fs != null)
 					try {
 						fs.close();
 					} catch (IOException e) {
-						getLogger().logWarning(e);
+						getLogger().warning(e);
 					}
 	        }
 		} 

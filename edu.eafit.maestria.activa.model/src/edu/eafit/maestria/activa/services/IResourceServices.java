@@ -9,5 +9,5 @@ import edu.eafit.maestria.activa.model.ITaggedResource;
 public interface IResourceServices {
 	public void deleteTaggedResource(ITaggedResource taggedResource);
 	public ITaggedResource addTaggedResource(String tag, IEntity entity, IResource resource);
-	public IResource createResource(File file);
+	public IResource createResource(File file) throws Exception;
 }

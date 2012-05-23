@@ -13,6 +13,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import edu.eafit.maestria.activa.dao.hibernate.Messages;
 import edu.eafit.maestria.activa.utilities.ActivaConfig;
 
 
@@ -20,6 +21,8 @@ import edu.eafit.maestria.activa.utilities.ActivaConfig;
 @Table(name="act_resource")
 public class Resource implements IResource
 {
+	private static final String RESOURCE_DEFAULT_NAME = "resource_";
+
 	private static final long serialVersionUID = 1L;
 	
 	private long resourceId;
@@ -124,7 +127,7 @@ public class Resource implements IResource
 			parent.mkdirs();
 
 		StringBuilder buf = new StringBuilder();
-		buf.append("resource_");
+		buf.append(RESOURCE_DEFAULT_NAME);
 		buf.append(Long.toString(getResourceId()));
 
 		int ndx = name.lastIndexOf(".");
@@ -184,7 +187,7 @@ public class Resource implements IResource
 	private static String getHashedPath(long id)
 	{
 		if (id < 0)
-			throw new IllegalStateException("Unable to process document hashed path for an invalid id (id=" + id + ")");
+			throw new IllegalStateException(String.format(Messages.UNABLE_TO_PROCESS_DOCUMENT, id));
 
 		long level1 = id / 250000;
 		long level2 = (id % 250000) / 500;

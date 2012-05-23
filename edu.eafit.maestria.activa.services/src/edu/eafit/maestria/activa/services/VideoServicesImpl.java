@@ -12,7 +12,7 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class VideoServicesImpl implements IVideoServices{
 	
-	private final LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName(), VideoServicesImpl.class);
+	private static final LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName());
 	
 	private static VideoServicesImpl videoServicesImpl;
 	private XStream xs;
@@ -30,7 +30,6 @@ public class VideoServicesImpl implements IVideoServices{
 
 	@Override
 	public Video loadVideo(String name) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -44,14 +43,14 @@ public class VideoServicesImpl implements IVideoServices{
 		        video.resetModified();
 			}
         } catch (FileNotFoundException e) {
-            logger.logError(e);
+            logger.error(e);
             return false;
         } finally {
         	if (fs != null)
 				try {
 					fs.close();
 				} catch (IOException e) {
-					logger.logWarning(e);
+					logger.warning(e);
 				}
         }
         

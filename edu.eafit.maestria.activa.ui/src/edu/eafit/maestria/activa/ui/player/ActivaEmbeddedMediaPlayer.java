@@ -1,3 +1,4 @@
+
 package edu.eafit.maestria.activa.ui.player;
 
 import java.awt.Rectangle;
@@ -13,14 +14,18 @@ import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t;
-import uk.co.caprica.vlcj.logger.Logger;
 import uk.co.caprica.vlcj.player.DefaultMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
+import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements EmbeddedMediaPlayer {
 
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
+	
 	 /**
 	   * Full-screen strategy implementation, may be <code>null</code>. 
 	   */
@@ -87,18 +92,16 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    this.overlayWindowAdapter = new OverlayWindowAdapter();
 	  }
 
-	//  @Override
+	  @Override
 	  public void setVideoSurface(CanvasVideoSurface videoSurface) {
-	    Logger.debug("setVideoSurface(videoSurface={})", videoSurface);
 	    // Keep a hard reference to the video surface component
 	    this.videoSurface = videoSurface;
 	    // The video surface is not actually attached to the media player until the
 	    // media is played
 	  }
 
-	//  @Override
+	  @Override
 	  public void attachVideoSurface() {
-	    Logger.debug("attachVideoSurface()");
 	    if(videoSurface != null) {
 	      // The canvas component must be visible at this point otherwise the call
 	      // to the native library will fail
@@ -107,26 +110,24 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	      }
 	      else {
 	        // This is an error
-	        throw new IllegalStateException("The video surface is not visible");
+	        throw new IllegalStateException(Messages.VLC_VIDEO_SURFACE_ERROR);
 	      }
 	    }
 	    else {
 	      // This is not necessarily an error
-	      Logger.debug("Can't attach video surface since no video surface has been set");
+	      logger.info(Messages.VLC_ATTACH_VIDEO_ERROR);
 	    }
 	  }
 
-	//  @Override
+	  @Override
 	  public void toggleFullScreen() {
-	    Logger.debug("toggleFullScreen()");
 	    if(fullScreenStrategy != null) {
 	      setFullScreen(!fullScreenStrategy.isFullScreenMode());
 	    }
 	  }
 
-	//  @Override
+	  @Override
 	  public void setFullScreen(boolean fullScreen) {
-	    Logger.debug("setFullScreen(fullScreen={})", fullScreen);
 	    if(fullScreenStrategy != null) {
 	      if(fullScreen) {
 	        fullScreenStrategy.enterFullScreenMode();
@@ -137,9 +138,8 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    }
 	  }
 	  
-	//  @Override
+	@Override
 	  public boolean isFullScreen() {
-	    Logger.debug("isFullScreen()");
 	    if(fullScreenStrategy != null) {
 	      return fullScreenStrategy.isFullScreenMode();
 	    }
@@ -148,28 +148,25 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    }
 	  }
 	  
-	//  @Override
+	@Override
 	  public BufferedImage getVideoSurfaceContents() {
-	    Logger.debug("getVideoSurfaceContents()");
 	    try {
 	      Rectangle bounds = videoSurface.canvas().getBounds();
 	      bounds.setLocation(videoSurface.canvas().getLocationOnScreen());
 	      return new Robot().createScreenCapture(bounds);
 	    } 
 	    catch(Exception e) {
-	      throw new RuntimeException("Failed to get video surface contents", e);
+	      throw new RuntimeException(Messages.VLC_VIDEO_SURFACE_CONTENT_ERROR, e);
 	    }
 	  }
 	  
-	//  @Override
+	@Override
 	  public Window getOverlay() {
-	    //Logger.debug("getOverlay()");
 	    return overlay;
 	  }
 	  
-	//  @Override
+	@Override
 	  public void setOverlay(Window overlay) {
-	    Logger.debug("setOverlay(overlay={})", overlay);
 	    if(videoSurface != null) {
 	      // Disable the current overlay if there is one
 	      enableOverlay(false);
@@ -179,13 +176,12 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	      addOverlay(overlay);
 	    }
 	    else {
-	      throw new IllegalStateException("Can't set an overlay when there's no video surface");
+	      throw new IllegalStateException();
 	    }
 	  }
 
-	//  @Override
+	@Override
 	  public void enableOverlay(boolean enable) {
-	    Logger.debug("enableOverlay(enable={})", enable);
 	    requestedOverlay = enable;
 	    if(overlay != null) {
 	      if(enable) {
@@ -207,21 +203,18 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    }
 	  }
 	  
-	//  @Override
+	@Override
 	  public boolean overlayEnabled() {
-	    Logger.debug("overlayEnabled()");
 	    return overlay != null && overlay.isVisible();
 	  }
 	  
-	//  @Override
+	@Override
 	  public void setEnableMouseInputHandling(boolean enable) {
-	    Logger.debug("setEnableMouseInputHandling(enable={})", enable);
 	    libvlc.libvlc_video_set_mouse_input(mediaPlayerInstance(), enable ? 1 : 0);
 	  }
 	  
-	//  @Override
+	@Override
 	  public void setEnableKeyInputHandling(boolean enable) {
-	    Logger.debug("setEnableKeyInputHandling(enable={})", enable);
 	    libvlc.libvlc_video_set_key_input(mediaPlayerInstance(), enable ? 1 : 0);
 	  }
 	  
@@ -231,7 +224,6 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	   * @param overlay overlay window
 	   */
 	  private void addOverlay(Window overlay) {
-	    Logger.debug("addOverlay(overlay={})", overlay);
 	    if(overlay != null) {
 	      this.overlay = overlay;
 	      Window window = (Window)SwingUtilities.getAncestorOfClass(Window.class, videoSurface.canvas());
@@ -240,7 +232,7 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	      }
 	      else {
 	        // This should not be possible
-	        Logger.warn("Failed to find a Window ancestor for the video surface Canvas");
+	        logger.warning(Messages.VLC_ADD_OVERLAY_ERROR);
 	      }
 	    }
 	  }
@@ -251,7 +243,6 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	   * @param overlay overlay window
 	   */
 	  private void removeOverlay() {
-	    Logger.debug("removeOverlay()");
 	    if(overlay != null) {
 	      Window window = (Window)SwingUtilities.getAncestorOfClass(Window.class, videoSurface.canvas());
 	      window.removeWindowListener(overlayWindowAdapter);
@@ -261,7 +252,6 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	  
 	  @Override
 	  protected final void onBeforePlay() {
-	    Logger.debug("onBeforePlay()");
 	    attachVideoSurface();
 	  }
 	  
@@ -273,25 +263,21 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 
 	    @Override
 	    public void componentResized(ComponentEvent e) {
-	      Logger.trace("componentResized(e={})", e);
 	      overlay.setSize(videoSurface.canvas().getSize());
 	    }
 
 	    @Override
 	    public void componentMoved(ComponentEvent e) {
-	      Logger.trace("componentMoved(e={})", e);
 	      overlay.setLocation(videoSurface.canvas().getLocationOnScreen());
 	    }
 
 	    @Override
 	    public void componentShown(ComponentEvent e) {
-	      Logger.trace("componentShown(e={})", e);
 	      showOverlay();
 	    }
 
 	    @Override
 	    public void componentHidden(ComponentEvent e) {
-	      Logger.trace("componentHidden(e={})", e);
 	      hideOverlay();
 	    }
 	  }
@@ -304,25 +290,21 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	    
 	    @Override
 	    public void windowIconified(WindowEvent e) {
-	      Logger.trace("windowIconified(e={})", e);
 	      // Nothing, this is taken care of by "windowDeactivated"
 	    }
 
 	    @Override
 	    public void windowDeiconified(WindowEvent e) {
-	      Logger.trace("windowDeiconified(e={})", e);
 	      showOverlay();
 	    }
 	    
 	    @Override
 	    public void windowDeactivated(WindowEvent e) {
-	      Logger.trace("windowDeactivated(e={})", e);
 	      hideOverlay();
 	    }
 
 	    @Override
 	    public void windowActivated(WindowEvent e) {
-	      Logger.trace("windowActivated(e={})", e);
 	      showOverlay();
 	    }
 	  }
@@ -331,7 +313,6 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	   * Make the overlay visible.
 	   */
 	  private void showOverlay() {
-	    Logger.trace("showOverlay()");
 	    if(restoreOverlay) {
 	      enableOverlay(true);
 	    }
@@ -341,7 +322,6 @@ public class ActivaEmbeddedMediaPlayer extends DefaultMediaPlayer implements Emb
 	   * Hide the overlay.
 	   */
 	  private void hideOverlay() {
-	    Logger.trace("hideOverlay()");
 	    if(requestedOverlay) {
 	      restoreOverlay = true;
 	      enableOverlay(false);

@@ -12,12 +12,12 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * The animation cannot be splited, it has to be consecutive, it should have a shape for every frame it belongs to
- * @author wvelezva
  *
  */
 @XStreamAlias("animation")
 public class Animation {
-		
+	
+	private long id;
     private Color color;
     private ShapeKind kind;
     private int frameStart;
@@ -41,8 +41,13 @@ public class Animation {
         shapes.add(this.kind.getNewShape(r));
         this.frameStart = frameStart;
         this.frameEnd = frameStart;
+        this.id = System.currentTimeMillis();
     }
 
+    public long getId() {
+    	return id;
+    }
+    
     public Color getColor() {
 		return color;
 	}

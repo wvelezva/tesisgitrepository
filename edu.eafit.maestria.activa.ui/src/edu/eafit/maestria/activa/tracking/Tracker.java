@@ -7,6 +7,7 @@ import static com.googlecode.javacv.cpp.opencv_core.cvGetSize;
 import static com.googlecode.javacv.cpp.opencv_core.cvRect;
 import static com.googlecode.javacv.cpp.opencv_core.cvResetImageROI;
 import static com.googlecode.javacv.cpp.opencv_core.cvSetImageROI;
+import static com.googlecode.javacv.cpp.opencv_core.CvSize;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_GAUSSIAN;
@@ -20,8 +21,14 @@ import java.io.File;
 import com.googlecode.javacv.cpp.opencv_core.CvRect;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
+import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.utilities.LogUtil;
+
 public class Tracker {
-	private static final int ROI_SPACE = 20;
+	
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
+	
+	private static final int ROI_SPACE = 15;
 	protected static final int SCALE_DEFAULT = 1;
 	protected static int scale = SCALE_DEFAULT;
 	protected ActivaFrameGrabber fg = null; 
@@ -32,7 +39,7 @@ public class Tracker {
 		try {
 			fg.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		} 
 	}
 	
@@ -41,8 +48,7 @@ public class Tracker {
 			try {
 				fg.release();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 	}
@@ -52,6 +58,18 @@ public class Tracker {
 	}
 	
 	public static IplImage getTrackingImg(IplImage frame, int x, int y, int width, int height, boolean save, String fileName){
+		CvSize size = cvGetSize(frame);
+		if (x < 0)
+			x = 0;
+		if (y < 0)
+			y = 0;
+		
+		if (x + width > size.width())
+			x = size.width() - width;
+		
+		if (y + height > size.height())
+			y= size.height() - height;
+		
 		CvRect roiRect = cvRect(x, y, width, height);
 		cvSetImageROI(frame, roiRect);
 		IplImage templateimg = cvCreateImage(cvGetSize(frame),frame.depth(),frame.nChannels());
@@ -121,7 +139,7 @@ public class Tracker {
 			cvSmooth(img, img, CV_GAUSSIAN, 3);
 			return img;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return null;
 	}

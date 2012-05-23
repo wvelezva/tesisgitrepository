@@ -31,14 +31,19 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.handlers.player.SaveSnapshotHandler;
 import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.Constants;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class PlayerControlsPanel extends Composite {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), PlayerControlsPanel.class);
+	private static final String FRAME_DEFAULT = "0000000000";
+
+	private static final String TIME_FORMAT = "hh:mm:ss";
+
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	private static final int VLC_OFFSET = 15;
-	private static final long SKIP_TIME_MS = 10 * 1000;
+	private static final long SKIP_TIME_MS = 10 * Constants.Player.MILLIS_IN_SECONDS;
 
 	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -60,7 +65,6 @@ public class PlayerControlsPanel extends Composite {
 	private Button markSceneButton;
 	private Long currentFrame;
 
-	private boolean mousePressedPlaying = false;
 	private boolean frameByFrame = false;
 
 	public PlayerControlsPanel(Composite parent, EmbeddedMediaPlayer mediaPlayer) {
@@ -74,7 +78,7 @@ public class PlayerControlsPanel extends Composite {
 		registerListeners();
 		setEnabled(false);
 		
-		executorService.scheduleAtFixedRate(new UpdateControls(mediaPlayer), 0L, 250L, TimeUnit.MILLISECONDS);
+		executorService.scheduleAtFixedRate(new UpdateControls(mediaPlayer), 0L, 100L, TimeUnit.MILLISECONDS);
 	}
 
 	private void createTopPanel() {
@@ -82,7 +86,7 @@ public class PlayerControlsPanel extends Composite {
 		topPanel.setLayout(new GridLayout(4,false));
 		
 		timeLabel = new Label(topPanel, SWT.NONE);
-		timeLabel.setText("hh:mm:ss");
+		timeLabel.setText(TIME_FORMAT);
 
 		positionScale = new Scale(topPanel, SWT.HORIZONTAL);
 		
@@ -100,16 +104,16 @@ public class PlayerControlsPanel extends Composite {
 		sceneLabel = new Label(topPanel, SWT.NONE);
 		sceneLabel.setText("1/1");
 		frameLabel = new Label(topPanel, SWT.NONE);
-		frameLabel.setText("0000000000");
+		frameLabel.setText(FRAME_DEFAULT);
 	}
 	
 	public void setEnabled(boolean enabled){
 		if (!enabled) {
-			timeLabel.setText("hh:mm:ss");
+			timeLabel.setText(TIME_FORMAT);
 			positionScale.setSelection(0);
 			volumeScale.setSelection(0);
 			sceneLabel.setText("1/1");
-			frameLabel.setText("0000000000");
+			frameLabel.setText(FRAME_DEFAULT);
 		}
 		super.setEnabled(enabled);
 	}
@@ -174,7 +178,7 @@ public class PlayerControlsPanel extends Composite {
 		if (!mediaPlayer.isSeekable()) {
 			return;
 		}
-		float positionValue = (float) positionScale.getSelection() / 1000.0f;
+		float positionValue = (float) positionScale.getSelection() / Constants.Player.MILLIS_IN_SECONDS;
 		// Avoid end of file freeze-up
 		if (positionValue > 0.99f) {
 			positionValue = 0.99f;
@@ -184,7 +188,7 @@ public class PlayerControlsPanel extends Composite {
 
 	private void updateUIState() {
 		long time = mediaPlayer.getTime();
-		int position = (int) (mediaPlayer.getPosition() * 1000.0f);
+		int position = (int) (mediaPlayer.getPosition() * Constants.Player.MILLIS_IN_SECONDS);
 		int chapter = mediaPlayer.getChapter();
 		int chapterCount = mediaPlayer.getChapterCount();
 		updateTime(time);
@@ -194,7 +198,7 @@ public class PlayerControlsPanel extends Composite {
 	}
 
 	private void updateFrames(long time) {
-		double frame = Math.ceil((mediaPlayer.getFps()/1000)*time);
+		double frame = Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*time);
 		currentFrame = Double.valueOf(frame).longValue();
 		
 		frameLabel.setText(Long.toString(currentFrame));
@@ -231,11 +235,6 @@ public class PlayerControlsPanel extends Composite {
 			
 			@Override
 			public void mouseDown(MouseEvent e) {
-				if (mediaPlayer.isPlaying()) {
-					mousePressedPlaying = true;
-				} else {
-					mousePressedPlaying = false;
-				}
 				setSliderBasedPosition();
 			}
 
@@ -251,23 +250,22 @@ public class PlayerControlsPanel extends Composite {
 			@Override
 			public void handleEvent(Event event) {
 				pause();
-				double frame = Math.ceil((mediaPlayer.getFps()/1000)*mediaPlayer.getTime());
+				double frame = Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*mediaPlayer.getTime());
 				currentFrame = Double.valueOf(frame).longValue();
 				if (currentFrame != null && currentFrame.longValue() > 0) {
 					
-					long frameLength = Double.valueOf(1000/mediaPlayer.getFps()).longValue();
+					long frameLength = Double.valueOf(Constants.Player.MILLIS_IN_SECONDS/mediaPlayer.getFps()).longValue();
 					long previousFrame = 0;
 					long helperFrame = 0;
 					long newTime = mediaPlayer.getTime() - frameLength;
 					do {
-						previousFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*newTime)).longValue();
-						helperFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*(newTime+VLC_OFFSET))).longValue();
+						previousFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*newTime)).longValue();
+						helperFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*(newTime+VLC_OFFSET))).longValue();
 						if (previousFrame != helperFrame) {
 							newTime -= VLC_OFFSET;
 						} 
 						
 					} while (previousFrame >= currentFrame || helperFrame >= currentFrame);
-					//mediaPlayer.skip(-(mediaPlayer.getTime() - newTime)); 
 					mediaPlayer.setTime(newTime); 
 					updateUIState();
 					frameByFrame = true;
@@ -309,16 +307,16 @@ public class PlayerControlsPanel extends Composite {
 			@Override
 			public void handleEvent(Event event) {
 				pause();
-				double frame = Math.ceil((mediaPlayer.getFps()/1000)*mediaPlayer.getTime());
+				double frame = Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*mediaPlayer.getTime());
 				currentFrame = Double.valueOf(frame).longValue();
-				if (currentFrame != null && currentFrame.longValue() < Math.ceil(mediaPlayer.getFps()/1000)*mediaPlayer.getLength()) {
+				if (currentFrame != null && currentFrame.longValue() < Math.ceil(mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*mediaPlayer.getLength()) {
 				
-					long frameLength = Double.valueOf(1000/mediaPlayer.getFps()).longValue();
+					long frameLength = Double.valueOf(Constants.Player.MILLIS_IN_SECONDS/mediaPlayer.getFps()).longValue();
 					long nextFrame = currentFrame + 1;
 					long newTime = currentFrame * frameLength;
-					long aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*newTime)).longValue();
+					long aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*newTime)).longValue();
 					while (aproxNextFrame < nextFrame) {
-						aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/1000)*++newTime)).longValue();
+						aproxNextFrame = Double.valueOf(Math.ceil((mediaPlayer.getFps()/Constants.Player.MILLIS_IN_SECONDS)*++newTime)).longValue();
 					} 
 					mediaPlayer.setTime(newTime);
 					updateUIState();
@@ -347,7 +345,7 @@ public class PlayerControlsPanel extends Composite {
 					IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
 					handlerService.executeCommand(SaveSnapshotHandler.commandId, null);
 				} catch (Exception ex) {
-					logger.logFatal(ex);
+					logger.fatal(ex);
 					PlatformUI.getWorkbench().close();
 				}
 			}
@@ -372,13 +370,17 @@ public class PlayerControlsPanel extends Composite {
 				@Override
 				public void run() {
 					long time = mediaPlayer.getTime();
-					int position = (int) (mediaPlayer.getPosition() * 1000.0f);
+					int position = (int) (mediaPlayer.getPosition() * Constants.Player.MILLIS_IN_SECONDS);
 					int chapter = mediaPlayer.getChapter();
 					int chapterCount = mediaPlayer.getChapterCount();
-					updateTime(time);
-					updatePosition(position);
-					updateScene(chapter, chapterCount);
-					updateFrames(time);
+					if (!timeLabel.isDisposed()) {
+						updateTime(time);
+						updatePosition(position);
+						updateScene(chapter, chapterCount);
+						updateFrames(time);
+					} else {
+						executorService.shutdown();
+					}
 				}
 			});
 		}

@@ -10,11 +10,11 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class NotImplementedHandler extends AbstractHandler implements IHandler {
 
-	private final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), NotImplementedHandler.class);
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		logger.logInfo("Not implemented");
+		logger.info("Not implemented");
 		return null;
 	}
 

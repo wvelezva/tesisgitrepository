@@ -5,6 +5,8 @@
 // Generated on: 2012.03.27 at 06:52:02 AM COT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "xdvbpcf", namespaceURI="http://www.dvb.org/pcf/x-dvb-pcf")}, 
-									elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+		xmlns = { 
+				@javax.xml.bind.annotation.XmlNs(prefix = "xdvbpcf", namespaceURI="http://www.dvb.org/pcf/x-dvb-pcf")
+		})
 package org.dvb.pcf.x_dvb_pcf;

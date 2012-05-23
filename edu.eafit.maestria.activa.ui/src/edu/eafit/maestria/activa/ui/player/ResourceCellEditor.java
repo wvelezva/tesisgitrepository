@@ -13,11 +13,7 @@ public class ResourceCellEditor extends DialogCellEditor {
 	
 	@Override
 	protected Object openDialogBox(Control cellEditorWindow) {
-		//FileDialog fileDialog = new FileDialog(cellEditorWindow.getShell());
 		FileDialog fileDialog = new FileDialog(getControl().getShell());
-		//fileDialog.setText(Messages.COMMAND_FILE_NEW_SOURCE_VIDEO_OPEN_DIALOG);
-		
-		// Open Dialog and save result of selection
 		
 		String value = (String) getValue();
 
@@ -25,6 +21,7 @@ public class ResourceCellEditor extends DialogCellEditor {
            fileDialog.setFileName(value);
         }
         
+        // Open Dialog and save result of selection
         String data = fileDialog.open();
 			
         if (data != null) {

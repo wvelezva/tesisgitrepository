@@ -5,6 +5,10 @@
 // Generated on: 2012.03.27 at 06:52:02 AM COT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "pcf", namespaceURI="http://www.dvb.org/pcf/pcf")},
-									elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+		namespace = "http://www.dvb.org/pcf/pcf", 
+	    xmlns = { 
+				@javax.xml.bind.annotation.XmlNs(prefix = "pcf", namespaceURI="http://www.dvb.org/pcf/pcf")
+		},
+		elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.dvb.pcf.pcf;

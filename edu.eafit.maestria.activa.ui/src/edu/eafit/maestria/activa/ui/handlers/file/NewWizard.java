@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.PlatformUI;
 
 import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
@@ -18,13 +17,11 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class NewWizard extends Wizard {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), NewWizard.class);
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	private NewWizardPage newWizardPage;
-	private ExecutionEvent event;
 	
-	public NewWizard(ExecutionEvent event) {
+	public NewWizard() {
 		super();
-		this.event = event;
 		setWindowTitle(Messages.COMMAND_FILE_NEW_WIZARD_TITLE);
 	}
 
@@ -45,10 +42,10 @@ public class NewWizard extends Wizard {
 			try {
 				FileUtils.deleteDirectory(projectDir);
 			} catch (IOException e) {
-				logger.logError(e);
+				
 			}
-			logger.logFatal(new Exception("Project cannot be null"));
-			HandlerUtil.getActiveWorkbenchWindow(event).close();
+			logger.fatal(new Exception(Messages.COMMAND_FILE_NEW_WIZARD_PROJECT_NULL));
+			PlatformUI.getWorkbench().close();
 		}
 		
 		ActivaPlayer.getInstance().prepareNewMedia(project.getVideo());

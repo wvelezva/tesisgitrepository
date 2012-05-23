@@ -11,7 +11,6 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 public class MetadataToFileConverter extends ObjectToFileConverter {
 
 	private XStream xs;
-	//private LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName(), MetadataToFileConverter.class);
 	
 	public MetadataToFileConverter(){
 		xs = new XStream();
@@ -36,7 +35,6 @@ public class MetadataToFileConverter extends ObjectToFileConverter {
 
 	@Override
 	public LogUtil getLogger() {
-		//return logger;
 		return null;
 	}
 

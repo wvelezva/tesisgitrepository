@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -46,6 +47,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.eafit.maestria.activa.container.Container;
@@ -57,20 +60,26 @@ import edu.eafit.maestria.activa.model.IType;
 import edu.eafit.maestria.activa.model.ResourceTag;
 import edu.eafit.maestria.activa.services.IEntityServices;
 import edu.eafit.maestria.activa.services.IResourceServices;
+import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.model.EntityWrapper;
 import edu.eafit.maestria.activa.ui.model.ModelProvider;
 import edu.eafit.maestria.activa.ui.model.PropertyWrapper;
 import edu.eafit.maestria.activa.ui.model.TaggedResourceWrapper;
 import edu.eafit.maestria.activa.ui.utils.Messages;
 import edu.eafit.maestria.activa.utilities.Constants;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class Properties extends Composite {
 	
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
+	
 	private final DecimalFormat templateNumberFormat = new DecimalFormat(Constants.Template.TEMPLATE_FILE_NAME_FORMAT);
 	
+	private Animation animation;
 	private EntityWrapper entity;
 	
 	private Canvas thumbnail;
+	private Button selectEntity;
 	private Text nameInput;
 	private Text descriptionInput;
 	private ComboViewer comboViewer;
@@ -90,7 +99,6 @@ public class Properties extends Composite {
 	public Properties(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(3, false));
-		new Label(this, SWT.NONE);// to make the table structure valid
 		createElements();
 		registerListeners();
 		setEnabled(false);
@@ -99,14 +107,19 @@ public class Properties extends Composite {
 	}
 
 	private void createElements() {
+		new Label(this, SWT.NONE);// to make the table structure valid
 		thumbnail = new Canvas(this, SWT.DEFAULT);
+		thumbnail.setTouchEnabled(true);
 		GridData gd_thumbnail = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_thumbnail.heightHint = 154;
 		gd_thumbnail.widthHint = 181;
 		thumbnail.setLayoutData(gd_thumbnail);
 		thumbnail.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_SELECTION));
 		
-		new Label(this, SWT.NONE);
+		selectEntity = new Button(this, SWT.NONE);
+		selectEntity.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		selectEntity.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/16/transcode-16.png"));
+		selectEntity.setToolTipText(Messages.PROPERTIES_CHANGE_ENTITY);
 		
 		Label name = new Label(this, SWT.NONE);
 		name.setText(Messages.PROPERTIES_NAME);
@@ -142,7 +155,7 @@ public class Properties extends Composite {
 		
 		delProperty = new Button(this, SWT.NONE);
 		delProperty.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		delProperty.setText("-");
+		delProperty.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/16/delete-16.png"));
 		delProperty.setToolTipText(Messages.PROPERTIES_DELETE_PROPERTY);
 		
 		propertiesViewer = new TableViewer(this, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
@@ -163,7 +176,7 @@ public class Properties extends Composite {
 		
 		delResource = new Button(this, SWT.NONE);
 		delResource.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		delResource.setText("-");
+		delResource.setImage(ResourceManager.getPluginImage(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/16/delete-16.png"));
 		delResource.setToolTipText(Messages.PROPERTIES_DELETE_RESOURCE);
 		
 		resourcesViewer =new TableViewer(this, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
@@ -283,8 +296,47 @@ public class Properties extends Composite {
 			}
 
 		});
+
+		selectEntity.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				selectEntity();
+			}
+			
+		});
 	}
 	
+	protected void selectEntity() {
+		LabelProvider entityLabelProvider = new LabelProvider(){
+				@Override
+				public String getText(Object element) {
+					if (element instanceof IEntity) {
+						IEntity entity = (IEntity)element;
+						return entity.getEntityId() + "-" + entity.getName();
+					}
+					return super.getText(element);
+				}
+			};
+			
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(this.getShell(), entityLabelProvider);
+		dialog.setElements(entityServices.getEntities().toArray());
+		dialog.setTitle(Messages.PROPERTIES_SELECT_ENTITY);
+		dialog.setMessage(Messages.PROPERTIES_SELECT_ENTITY_HELP);
+		// User pressed cancel
+		if (dialog.open() != Window.OK) {
+			return;
+		}
+		
+		Object[] result = dialog.getResult();
+		
+		if (result != null && result.length > 0){
+			IEntity newEntity = (IEntity)result[0];
+			animation.setEntityId(newEntity.getEntityId());
+			animation.setEntity(newEntity);
+			setEntity(animation);
+		}
+	}
+
 	private void deleteProperty() {
 		if (!propertiesViewer.getSelection().isEmpty()) {
 			ISelection selection =  propertiesViewer.getSelection();
@@ -321,13 +373,13 @@ public class Properties extends Composite {
 		//name
 		IObservableValue widgetValue = WidgetProperties.text(SWT.Modify).observe(nameInput);
 		
-		IObservableValue modelValue = BeanProperties.value(EntityWrapper.class,	"name").observe(entity);
+		IObservableValue modelValue = BeanProperties.value(EntityWrapper.class,	EntityWrapper.NAME).observe(entity);
 		IValidator validator = new IValidator() {
 			@Override
 			public IStatus validate(Object value) {
 				String s = (String) value;
 				if (StringUtils.isBlank(s)) {
-					return ValidationStatus.error("Name should't be empty");
+					return ValidationStatus.error(Messages.PROPERTIES_BIND_ERROR);
 				}
 				return ValidationStatus.ok();
 			}
@@ -340,7 +392,7 @@ public class Properties extends Composite {
 		
 		//desc
 		widgetValue = WidgetProperties.text(SWT.Modify).observe(descriptionInput);
-		modelValue = BeanProperties.value(EntityWrapper.class,	"description").observe(entity);
+		modelValue = BeanProperties.value(EntityWrapper.class,	EntityWrapper.DESCRIPTION).observe(entity);
 		ctx.bindValue(widgetValue, modelValue);
 	}
 
@@ -352,8 +404,8 @@ public class Properties extends Composite {
 	}
 	
 	public void setEntity(Animation animation) {
-		//removeBindings();
 		ctx.dispose();
+		this.animation = animation;
 		loadImage(animation);
 		entity = new EntityWrapper(animation.getEntity());
 		if (entity.getType() != null)
@@ -378,7 +430,7 @@ public class Properties extends Composite {
 			String id = templateNumberFormat.format(currentFrame);
 			String fileName =  id + Constants.File.ENTITY;
 			try {
-				imgFile = File.createTempFile(fileName, Constants.Template.TEMPLATE_FILE_EXTENSION, Container.getProject().getVideo().getSnapshotDirectory());
+				imgFile = File.createTempFile(fileName, Constants.File.SNAPSHOT_FILE_EXTENSION, Container.getProject().getVideo().getSnapshotDirectory());
 				ActivaPlayer.getInstance().getTemplate(shape.getBounds(), imgFile);
 				imgFile.deleteOnExit();
 				IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
@@ -387,25 +439,29 @@ public class Properties extends Composite {
 				resourceServices.addTaggedResource(ResourceTag.ENTITY.toString(), entity, resource);
 				
 			} catch (IOException e) {		
-				System.out.println(e);
-				e.printStackTrace();
+				logger.error(e);
+			} catch (Exception e) {
+				logger.error(e, Messages.PROPERTIES_COPYING_IMG_ERROR);
 			}
 		} 
 		
 		if (imgFile != null) {
-			final Image img = new Image(this.getDisplay(), imgFile.getAbsolutePath());
-			if (paintListener != null)
-				thumbnail.removePaintListener(paintListener);
-			
-			paintListener = new PaintListener () {
-				public void paintControl(PaintEvent e) {
-					e.gc.drawImage(img, 0,0);
-				}
-			};
-			
-			thumbnail.addPaintListener(paintListener);
-			thumbnail.redraw();
-			
+			try {
+				final Image img = new Image(this.getDisplay(), imgFile.getAbsolutePath());
+				if (paintListener != null)
+					thumbnail.removePaintListener(paintListener);
+				
+				paintListener = new PaintListener () {
+					public void paintControl(PaintEvent e) {
+						e.gc.drawImage(img, 0,0);
+					}
+				};
+				
+				thumbnail.addPaintListener(paintListener);
+				thumbnail.redraw();
+			} catch (Exception e){
+				logger.error(e);
+			}
 		}
 	}
 

@@ -16,15 +16,7 @@ public class Perspective implements IPerspectiveFactory {
 	 */
 	public static final String ID = "activa.ui.perspective";
 
-	public void createInitialLayout(IPageLayout layout) {
-//		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-//			   public void run() {
-//			    ((IContextService) PlatformUI.getWorkbench()
-//			     .getService(IContextService.class))
-//			      .activateContext("activa.context");
-//			   }
-//			});
-		
+	public void createInitialLayout(IPageLayout layout) {		
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 

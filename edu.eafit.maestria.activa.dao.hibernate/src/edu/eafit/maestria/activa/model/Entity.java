@@ -115,7 +115,7 @@ public class Entity implements IEntity{
 		this.archived = archived;
 	}
 
-	@OneToMany(targetEntity=Property.class,mappedBy="entity",fetch=FetchType.EAGER,cascade=CascadeType.ALL,orphanRemoval=true)
+	@OneToMany(targetEntity=Property.class,mappedBy="entity",fetch=FetchType.LAZY,cascade=CascadeType.ALL,orphanRemoval=true)
 	@Override
 	public List<IProperty> getProperties() {
 		return properties;

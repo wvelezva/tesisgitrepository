@@ -1,5 +1,7 @@
 package edu.eafit.maestria.activa.services;
 
+import java.util.List;
+
 import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
 import edu.eafit.maestria.activa.model.IResource;
@@ -11,4 +13,5 @@ public interface IEntityServices {
 	public void save(IEntity entity);
 	public IEntity getByAnimation(Animation animation);
 	public IResource getEntityImage(IEntity entity);
+	public List<IEntity> getEntities();
 }

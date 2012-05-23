@@ -4,13 +4,9 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import edu.eafit.maestria.activa.services.AnimationUtils;
-import edu.eafit.maestria.activa.ui.UIActivator;
-import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class SelectMouseMotionAdapter extends ActivaMouseMotionAdapter {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), SelectMouseMotionAdapter.class);
-	
 	private Overlay overlay;
 	private Point delta = new Point();
 	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();

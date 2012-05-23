@@ -14,11 +14,16 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 
 import edu.eafit.maestria.activa.dao.hibernate.DAOActivator;
+import edu.eafit.maestria.activa.dao.hibernate.Messages;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class BaseDaoHibernate<T> {
 	
-	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName(), BaseDaoHibernate.class);
+	private static final String QUERY_FOR_SIZE = "select count(*)";
+
+	private static final String ARCHIVED_FIELD = "archived";
+
+	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName());
 	
 	private Session session;
 	private Class<? extends T> persistentClass;
@@ -29,7 +34,6 @@ public class BaseDaoHibernate<T> {
 	 */
 	public BaseDaoHibernate(Session session, Class<? extends T> persistentClass) {
 		this.session = session;
-		//this.persistentClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		this.template =HibernateTemplate.getInstance(session);
 		this.persistentClass = persistentClass;
 	}
@@ -56,13 +60,12 @@ public class BaseDaoHibernate<T> {
 	 * @param clazz
 	 * @param id
 	 * @return
-	 * @author juanm
 	 */
 	protected T getObject(long id, LockOptions lockOptions) {
 		T o = (T)template.get(getPersistentClass(), Long.valueOf(id), lockOptions);
 
 		if (o == null) {
-			logger.logWarning("Object of entity [" + getPersistentClass() + "] with id [" + Long.valueOf(id) + "] don't existe");
+			logger.warning(Messages.ERROR_OBJECT_DOESNT_EXIST, getPersistentClass(), Long.valueOf(id));
 		}
 		return o;
 	}
@@ -70,7 +73,6 @@ public class BaseDaoHibernate<T> {
 	/**
 	 * Gets an object by his ID
 	 * 
-	 * @author spulido
 	 * @param inventoryId
 	 * @return
 	 */
@@ -93,7 +95,6 @@ public class BaseDaoHibernate<T> {
 	 * 
 	 * @param id
 	 * @return
-	 * @author juanm
 	 */
 	protected T getObject(long id) {
 		return load(id);
@@ -112,7 +113,7 @@ public class BaseDaoHibernate<T> {
 	 * @return
 	 */
 	protected List<T> getActiveObjects() {
-		return getObjectsByParam("archived", Boolean.FALSE);
+		return getObjectsByParam(ARCHIVED_FIELD, Boolean.FALSE);
 	}
 	
 	/**
@@ -159,7 +160,7 @@ public class BaseDaoHibernate<T> {
 	 */
 	protected void removeObject(T t) {
 		try {
-			BeanUtils.setProperty(t, "archived", Boolean.TRUE);
+			BeanUtils.setProperty(t, ARCHIVED_FIELD, Boolean.TRUE);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -197,10 +198,9 @@ public class BaseDaoHibernate<T> {
 	 * Finds the size of a collection
 	 * @param collection
 	 * @return
-	 * @author juan.maya
 	 */
 	public int size(Collection<?> collection) {
-		return ((Long) session.createFilter( collection, "select count(*)" ).uniqueResult()).intValue();
+		return ((Long) session.createFilter( collection, QUERY_FOR_SIZE ).uniqueResult()).intValue();
 	}
 
 	

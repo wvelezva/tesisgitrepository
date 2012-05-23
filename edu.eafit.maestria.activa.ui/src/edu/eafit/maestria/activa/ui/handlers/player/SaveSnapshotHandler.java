@@ -11,14 +11,10 @@ import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.Video;
-import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
-import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class SaveSnapshotHandler extends AbstractHandler implements IHandler {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), SaveSnapshotHandler.class);
-	
 	public static final String commandId = "activa.ui.command.player.saveSnapshot";
 	
 	@Override

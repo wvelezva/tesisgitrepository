@@ -290,6 +290,11 @@
 						style="push">
 	              </command>
                   <command
+                        commandId="activa.ui.command.detect.track.objectFinder"
+            			label="%command.detect.track.objectFinder"
+            			style="push">
+                  </command>
+                  <command
                         commandId="activa.ui.command.detect.track.opticalFlow"
             			label="%command.detect.track.opticalFlow"
             			style="push">
@@ -524,6 +529,12 @@
                label="%command.detect.track.template"
                style="push"
                tooltip="%command.detect.track.template">
+         </command>
+         <command
+               commandId="activa.ui.command.detect.track.objectFinder"
+               label="%command.detect.track.objectFinder"
+               style="push"
+               tooltip="%command.detect.track.objectFinder">
          </command>
          <command
                commandId="activa.ui.command.detect.track.opticalFlow"
@@ -856,6 +867,12 @@
             defaultHandler="edu.eafit.maestria.activa.ui.handlers.detect.TemplateMatchingHandler"
             id="activa.ui.command.detect.track.template"
             name="%command.detect.track.template">
+      </command>
+      <command
+      		categoryId="activa.ui.category.detect.track"
+            defaultHandler="edu.eafit.maestria.activa.ui.handlers.detect.ObjectFinderHandler"
+            id="activa.ui.command.detect.track.objectFinder"
+            name="%command.detect.track.objectFinder">
       </command>
       <command
       		categoryId="activa.ui.category.detect.track"
@@ -1192,6 +1209,11 @@
             commandId="activa.ui.command.detect.track.template"
             schemeId="activa.ui.key.scheme"
             sequence="M1+T">
+      </key>
+      <key
+            commandId="activa.ui.command.detect.track.objectFinder"
+            schemeId="activa.ui.key.scheme"
+            sequence="M1+F">
       </key>
       <key
             commandId="activa.ui.command.detect.track.opticalFlow"

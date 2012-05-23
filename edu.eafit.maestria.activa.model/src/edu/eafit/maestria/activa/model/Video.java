@@ -13,6 +13,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import edu.eafit.maestria.activa.model.converters.Convertable;
+import edu.eafit.maestria.activa.utilities.Constants;
 
 @XStreamAlias("video")
 public class Video implements Convertable{
@@ -36,7 +37,6 @@ public class Video implements Convertable{
 	@XStreamImplicit
 	private List<Scene> scenes;
 	
-	//@XStreamImplicit
 	private Map<Integer, List<Animation>> animations;
 	
 	@XStreamOmitField
@@ -80,7 +80,7 @@ public class Video implements Convertable{
 	}
 	private void updateTotalFrames() {
 		if (fps > 0 && length > 0 && totalFrames == 0)
-			totalFrames = Double.valueOf(Math.ceil(fps*(length/1000))).intValue();
+			totalFrames = Double.valueOf(Math.ceil(fps*(length/Constants.Player.MILLIS_IN_SECONDS))).intValue();
 	}
 
 	public int getWidth() {

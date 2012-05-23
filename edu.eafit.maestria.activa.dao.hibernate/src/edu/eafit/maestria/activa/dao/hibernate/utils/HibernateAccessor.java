@@ -5,11 +5,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import edu.eafit.maestria.activa.dao.hibernate.DAOActivator;
+import edu.eafit.maestria.activa.dao.hibernate.Messages;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public abstract class HibernateAccessor {
 
-	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName(), HibernateAccessor.class);
+	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName());
 	
 	/**
 	 * Never flush is a good strategy for read-only units of work.
@@ -231,7 +232,7 @@ public abstract class HibernateAccessor {
 	 */
 	protected void flushIfNecessary(Session session, boolean existingTransaction) throws HibernateException {
 		if (getFlushMode() == FLUSH_EAGER || (!existingTransaction && getFlushMode() != FLUSH_NEVER)) {
-			logger.logInfo("Eagerly flushing Hibernate session");
+			logger.info(Messages.EAGERLY_FLUSHING_HIBERNATE_SESSION);
 			session.flush();
 		}
 	}

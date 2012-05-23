@@ -17,6 +17,9 @@ public class TimestampInterceptor extends EmptyInterceptor {
 
 	private static final long serialVersionUID = -6527686121383178065L;
 
+	private static final String CDATE = "cdate";
+	private static final String MDATE = "mdate";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -28,20 +31,20 @@ public class TimestampInterceptor extends EmptyInterceptor {
 		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
 		Object cdate = null;
 		try {
-			BeanUtils.getProperty(entity, "cdate");
+			BeanUtils.getProperty(entity, CDATE);
 		} catch (Exception e) {
 		}
 
 		if (cdate == null)
-			modified = modifyProperty("cdate", currentDate, state, propertyNames);
+			modified = modifyProperty(CDATE, currentDate, state, propertyNames);
 
-		modified = modifyProperty("mdate", currentDate, state, propertyNames) || modified;
+		modified = modifyProperty(MDATE, currentDate, state, propertyNames) || modified;
 		return modified;
 	}
 	
 	@Override
 	public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState, String[] propertyNames,Type[] types) {
-		return modifyProperty("mdate", new Timestamp(System.currentTimeMillis()), currentState, propertyNames);
+		return modifyProperty(MDATE, new Timestamp(System.currentTimeMillis()), currentState, propertyNames);
 	}
 
 	/**

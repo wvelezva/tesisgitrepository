@@ -9,7 +9,6 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 public class VideoToFileConverter extends ObjectToFileConverter {
 
 	private XStream xs;
-	//private LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName(), VideoToFileConverter.class);
 	
 	public VideoToFileConverter(){
 		xs = new XStream();
@@ -29,7 +28,6 @@ public class VideoToFileConverter extends ObjectToFileConverter {
 
 	@Override
 	public LogUtil getLogger() {
-		//return logger;
 		return null;
 	}
 

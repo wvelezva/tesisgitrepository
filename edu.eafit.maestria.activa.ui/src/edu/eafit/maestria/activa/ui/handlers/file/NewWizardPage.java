@@ -26,6 +26,7 @@ import edu.eafit.maestria.activa.utilities.Constants;
 
 public class NewWizardPage extends WizardPage {
 	
+	private static final String WIZARD_NAME = "wizardPage";
 	private Text projectNameText;
 	private Text sourceVideoText;
 	private Button objectDetectionCheck;
@@ -38,7 +39,7 @@ public class NewWizardPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public NewWizardPage() {
-		super("wizardPage");
+		super(WIZARD_NAME);
 		setImageDescriptor(ResourceManager.getPluginImageDescriptor(UIActivator.getDefault().getBundle().getSymbolicName(), "icons/48/Folder Add-01 48.png"));
 		setTitle(Messages.COMMAND_FILE_NEW_PAGE_WIZARD_TITLE);
 		setDescription(Messages.COMMAND_FILE_NEW_PAGE_WIZARD_DESCRIPTION);
@@ -155,7 +156,7 @@ public class NewWizardPage extends WizardPage {
 	}
 
 	public File getProjectLocation(){
-		String projectLocation = store.getString(Constants.Preferences.WORKSPACE) + System.getProperty("file.separator") + projectNameText.getText();
+		String projectLocation = store.getString(Constants.Preferences.WORKSPACE) + File.separator + projectNameText.getText();
 		return new File(projectLocation);
 	}
 	

@@ -27,7 +27,6 @@ import static com.googlecode.javacv.cpp.opencv_highgui.CV_CAP_PROP_FRAME_HEIGHT;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_CAP_PROP_FRAME_WIDTH;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_CAP_PROP_MODE;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_CAP_PROP_POS_MSEC;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvCreateCameraCapture;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvCreateFileCapture;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvGetCaptureProperty;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvGrabFrame;
@@ -41,22 +40,29 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 
 import java.io.File;
 
+import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+
 import com.googlecode.javacpp.Loader;
 import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui.CvCapture;
 
-/**
- *
- * @author Samuel Audet
- */
+import edu.eafit.maestria.activa.ui.UIActivator;
+import edu.eafit.maestria.activa.ui.utils.Messages;
+import edu.eafit.maestria.activa.utilities.Constants;
+import edu.eafit.maestria.activa.utilities.LogUtil;
+
 public class ActivaFrameGrabber extends FrameGrabber {
-    public static String[] getDeviceDescriptions() throws Exception {
+    
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
+	
+	public static String[] getDeviceDescriptions() throws Exception {
         tryLoad();
-        throw new UnsupportedOperationException("Device enumeration not support by OpenCV.");
+        throw new UnsupportedOperationException(Messages.OPENCV_DEVICE_ENUM_NOT_SUPPORTED);
     }
 
     private static Exception loadingException = null;
+    
     public static void tryLoad() throws Exception {
         if (loadingException != null) {
             throw loadingException;
@@ -89,8 +95,6 @@ public class ActivaFrameGrabber extends FrameGrabber {
         release();
     }
 
-    private static final boolean macosx = Loader.getPlatformName().startsWith("macosx");
-    private int deviceNumber = 0;
     private String filename = null;
     private CvCapture capture = null;
     private IplImage return_image = null;
@@ -111,14 +115,9 @@ public class ActivaFrameGrabber extends FrameGrabber {
         if (filename != null && filename.length() > 0) {
             capture = cvCreateFileCapture(filename);
             if (capture == null) {
-                throw new Exception("cvCreateFileCapture() Error: Could not create camera capture.");
+                throw new Exception(Messages.OPENCV_CREATE_FILE_CAPTURE_ERROR);
             }
-        } else {
-            capture = cvCreateCameraCapture(deviceNumber);
-            if (capture == null) {
-                throw new Exception("cvCreateCameraCapture() Error: Could not create camera capture.");
-            }
-        }
+        } 
         if (imageWidth > 0) {
             if (cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, imageWidth) == 0) {
                 cvSetCaptureProperty(capture, CV_CAP_PROP_MODE, imageWidth); // ??
@@ -137,7 +136,7 @@ public class ActivaFrameGrabber extends FrameGrabber {
         }
         cvSetCaptureProperty(capture, CV_CAP_PROP_CONVERT_RGB, imageMode == ImageMode.COLOR ? 1 : 0);
 
-        if (macosx) {
+        if (RuntimeUtil.isMac()) {
             // Before cvRetrieveFrame() starts returning something else then null
             // QTKit sometimes requires some "warm-up" time for some reason...
             int count = 0;
@@ -164,14 +163,14 @@ public class ActivaFrameGrabber extends FrameGrabber {
         }
         int err = cvGrabFrame(capture);
         if (err == 0) {
-            throw new Exception("cvGrabFrame() Error: Could not grab frame. (Has start() been called?)");
+            throw new Exception(Messages.OPENCV_CVGRABFRAME_ERROR);
         }
     }
 
     public IplImage grab() throws Exception {
         IplImage image = cvRetrieveFrame(capture);
         if (image == null) {
-            throw new Exception("cvRetrieveFrame() Error: Could not retrieve frame. (Has start() been called?)");
+            throw new Exception(Messages.OPENCV_CVRETRIEVEFRAME_ERROR);
         }
         if (!triggerMode) {
             trigger();
@@ -193,7 +192,7 @@ public class ActivaFrameGrabber extends FrameGrabber {
 
         if (!timestampBroken) {
             double pos = cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);
-            return_image.timestamp = Math.round(pos*1000);
+            return_image.timestamp = Math.round(pos*Constants.Player.MILLIS_IN_SECONDS);
             if (prevPos == pos) {
                 timestampBroken = true;
             } else {
@@ -207,7 +206,7 @@ public class ActivaFrameGrabber extends FrameGrabber {
 		try {
 			return grab();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return null;
 	}
@@ -225,7 +224,7 @@ public class ActivaFrameGrabber extends FrameGrabber {
 		
 		getFrame();
 		double fps = cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
-		double fxm = 1000/fps;
+		double fxm = Constants.Player.MILLIS_IN_SECONDS/fps;
 		double pos = cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);
 		if (pos > (currentTime - 2*fxm))
 			return setInitTime(currentTime, fixedTime);

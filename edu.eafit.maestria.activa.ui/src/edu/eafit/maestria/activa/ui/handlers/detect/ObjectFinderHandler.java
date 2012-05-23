@@ -7,13 +7,13 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.eafit.maestria.activa.tracking.TemplateMatching;
+import edu.eafit.maestria.activa.tracking.ObjectFinderExecutor;
 import edu.eafit.maestria.activa.tracking.Tracker;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 
-public class TemplateMatchingHandler extends TrackerHandler {
+public class ObjectFinderHandler extends TrackerHandler {
 
-	private static final String METHOD_NAME = "Template Matching";
+	private static final String METHOD_NAME = "Object Finder";
 	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
 
 	@Override
@@ -25,7 +25,7 @@ public class TemplateMatchingHandler extends TrackerHandler {
 	public List<Shape> track(Tracker tracker, long currentTime, Shape shape, BufferedImage template, boolean saveImg) {
 		Rectangle rectangle = (Rectangle)shape;
 		int[] params = fix(rectangle);
-		List<Point> matches = new TemplateMatching().track(tracker, currentTime, params, template, false);
+		List<Point> matches = new ObjectFinderExecutor().track(tracker, currentTime, params, template, true);
 		if (matches != null && !matches.isEmpty()) 
 			return fix(matches, rectangle);
 		

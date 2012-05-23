@@ -11,7 +11,7 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public abstract class ActivaMouseMotionAdapter extends MouseMotionAdapter {
 	
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaMouseMotionAdapter.class);
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	public abstract void setOverlay(Overlay overlay);
 	
@@ -20,7 +20,7 @@ public abstract class ActivaMouseMotionAdapter extends MouseMotionAdapter {
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
 			handlerService.executeCommand(LoadEntityHandler.commandId, null);
 		} catch (Exception ex) {
-			logger.logFatal(ex);
+			logger.fatal(ex);
 			PlatformUI.getWorkbench().close();
 		}
 	}

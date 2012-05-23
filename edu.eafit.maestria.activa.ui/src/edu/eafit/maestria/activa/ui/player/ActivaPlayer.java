@@ -13,7 +13,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -24,9 +23,9 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 import uk.co.caprica.vlcj.player.AudioTrackInfo;
-import uk.co.caprica.vlcj.player.MediaDetails;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
@@ -43,12 +42,13 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ActivaPlayer extends BaseVlcj {
 	
-	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), ActivaPlayer.class);
+	private static final int FPS = 28;
+
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	private ScheduledExecutorService executorService; 
 	private DecimalFormat snapshotNumberFormat;
 	
-	//private ActivaMediaPlayerFactory factory;
 	private MediaPlayerFactory factory;
 	private EmbeddedMediaPlayer player;
 	private PlayerControlsPanel controlsPanel;
@@ -79,8 +79,7 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	public void createUI(Composite parent, Player view){
 		if (player == null) {
-//			
-			/*VLC Player*/
+			
 			Composite videoComposite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE );
 			videoComposite.setLayoutData(new RowData(Constants.Player.WIDTH,Constants.Player.HEIGHT));
 			videoComposite.setVisible(true);
@@ -91,10 +90,9 @@ public class ActivaPlayer extends BaseVlcj {
 			
 			videoFrame = SWT_AWT.new_Frame(videoComposite);
 			videoFrame.add(videoSurface);
-			vlcArgs.add("--width=" + Constants.Player.WIDTH);
-		    vlcArgs.add("--height=" + Constants.Player.HEIGHT);
+			
 		    factory = new ActivaMediaPlayerFactory(vlcArgs);
-			player = factory.newEmbeddedMediaPlayer();
+		    player = factory.newEmbeddedMediaPlayer();
 			player.setVideoSurface(factory.newVideoSurface(videoSurface));
 			player.setPlaySubItems(true);
 			player.setEnableKeyInputHandling(false);
@@ -113,14 +111,14 @@ public class ActivaPlayer extends BaseVlcj {
 	    
 	    long period = 0;
 		if (player.getFps() > 0) {
-			double floor = Math.floor(1000/player.getFps()/1.5);
+			double floor = Math.floor(Constants.Player.MILLIS_IN_SECONDS/player.getFps()/1.5);
 			period = Double.valueOf(floor).longValue();
 		} else {
-			 period = 28; //(1000/24)/1.5=28 one second in milliseconds/number of frames by default
+			period = FPS; //(1000/24)/1.5=28 one second in milliseconds/number of frames by default
 		}
 		
 		executorService = Executors.newSingleThreadScheduledExecutor();
-		ScheduledFuture sf = executorService.scheduleAtFixedRate(new UpdateOverlay(), 0L, period, TimeUnit.MILLISECONDS);
+		executorService.scheduleAtFixedRate(new UpdateOverlay(), 0L, period, TimeUnit.MILLISECONDS);
 		
 	}
 	
@@ -167,17 +165,17 @@ public class ActivaPlayer extends BaseVlcj {
 
 	public EmbeddedMediaPlayer getPlayer(){
 		if (player == null) {
-			throw new RuntimeException("The player hasn't been initialized. You have to call VlcjPlayer.createUI(composite) first");
+			Exception playerNotInitialized = new Exception(Messages.VLC_PLAYER_NOT_INITIALIZED_ERROR);
+			logger.fatal(playerNotInitialized);
+			PlatformUI.getWorkbench().close();
 		}
 		return player;
 	}
 
 	public Overlay getOverlay(){
-		if (player == null) {
-			throw new RuntimeException("The player hasn't been initialized. You have to call VlcjPlayer.createUI(composite) first");
-		}
-		return (Overlay)player.getOverlay();
+		return (Overlay)getPlayer().getOverlay();
 	}
+
 	/**
 	 * when is a new project the first snece is saved
 	 * @param video
@@ -185,19 +183,13 @@ public class ActivaPlayer extends BaseVlcj {
 	 */
 	public boolean prepareNewMedia(final Video video) {
 		this.video=video;
-//		if (!player.startMedia(video.getVideo().getAbsolutePath())) {
-//			logger.logError("The media doesn't start");
-//			return false;
-//		}
 		player.prepareMedia(this.video.getVideo().getAbsolutePath());
-		//player.parseMedia();
-		
-		
+				
 		MediaPlayerEventAdapter mediaPlayerEventAdapter = new MediaPlayerEventAdapter() {
 				@Override
 				public void playing(MediaPlayer mediaPlayer) {
 					//TODO otro que hay que ensayar para sacar meta info del video
-					MediaDetails mediaDetails = player.getMediaDetails();
+					//MediaDetails mediaDetails = player.getMediaDetails();
 					
 					//corriendo el ejemplo mediainfotest se obtiene una salida que se puede parsear y obtener algunos datos
 					//este es un ejemplo de la salida
@@ -215,15 +207,9 @@ public class ActivaPlayer extends BaseVlcj {
 						else if (trackInfo instanceof AudioTrackInfo) {
 							AudioTrackInfo ati = (AudioTrackInfo) trackInfo;
 							video.setAudioCodec(ati.codecName());
-							//video.setAudioInfo(ati.);
 						}
 					}
 
-					//System.out.println(player.getSnapshot());
-					//System.out.println(player.getVideoSurfaceContents());
-					//System.out.println(player.getVideoDimension());
-					
-					
 					video.setLength(player.getLength());
 					video.setFps(player.getFps());
 					
@@ -236,10 +222,6 @@ public class ActivaPlayer extends BaseVlcj {
 		player.addMediaPlayerEventListener(mediaPlayerEventAdapter);
 		
 		player.play();
-		
-		//saveSnapshot(video.getScenes().get(0));
-		//player.setTime(0);
-//		player.pause();
 		
 		setOverlay();
 		enable();
@@ -259,7 +241,6 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	public void saveSnapshot(long scene) {
 		if (player == null || video == null || video.getSnapshotDirectory() == null) {
-			logger.logWarning("player not initialized");
 			return;
 		}
 		
@@ -269,24 +250,14 @@ public class ActivaPlayer extends BaseVlcj {
 			player.saveSnapshot(new File(video.getSnapshotDirectory(), id + Constants.File.SNAPSHOT_FILE_EXTENSION));
 			player.saveSnapshot(new File(video.getSnapshotDirectory(), id + Constants.File.THUMBNAIL + Constants.File.SNAPSHOT_FILE_EXTENSION), 100, 0);
 		} catch (Exception e) {
-			logger.logWarning(Messages.SAVE_SNAPSHOT_ERROR, e);
+			logger.warning(e, Messages.SAVE_SNAPSHOT_ERROR);
 		}
 	}
 	
 	public boolean saveSnapshot(Scene scene) {
 		if (player == null || video == null || video.getSnapshotDirectory() == null) {
-			logger.logWarning("player not initialized");
 			return false;
 		}
-		
-//		En el ejemplo snapshottest hacen esto para tomar el snapshot, van a una posicion y duermen
-//		mediaPlayer.startMedia(args[0]);
-//	    mediaPlayer.setPosition(0.25f);
-//	    Thread.sleep(1000)
-//		tambien muestran un bufferedimage demas que se puede usar para la linea de tiempo
-	    
-//		player.setPosition(0.25f);
-//	    mediaPlayer.setPosition(0.25f);
 		
 		try {
 			
@@ -305,7 +276,7 @@ public class ActivaPlayer extends BaseVlcj {
 			
 			
 		} catch (Exception e) {
-			logger.logWarning(Messages.SAVE_SNAPSHOT_ERROR, e);
+			logger.warning(e, Messages.SAVE_SNAPSHOT_ERROR);
 		}
 		return false;
 	}
@@ -318,12 +289,20 @@ public class ActivaPlayer extends BaseVlcj {
 	
 	public void disable(){
 		video = null;
-		executorService.shutdownNow();
-		player.stop();
-		player.enableOverlay(false);
-		player.setOverlay(null);
-		controlsPanel.setEnabled(false);
-		view.enableProperties(false);
+		if (executorService != null)
+			executorService.shutdownNow();
+		
+		if (player != null) {
+			player.stop();
+			player.enableOverlay(false);
+			player.setOverlay(null);
+		}
+		
+		if (controlsPanel != null)
+			controlsPanel.setEnabled(false);
+		
+		if (view != null)
+			view.enableProperties(false);
 	}
 		  
 	public void pause() {
@@ -352,7 +331,7 @@ public class ActivaPlayer extends BaseVlcj {
 							if (overlay.getAnimations() != null && !overlay.getAnimations().isEmpty()) {
 								List<Animation> nextAnimations = video.getAnimationsByFrame(controlsPanel.getCurrentFrame().intValue());
 								if (nextAnimations == null || nextAnimations.isEmpty())
-									if (MessageDialog.openQuestion(view.getSite().getShell(), "Question", "Do you want to copy the shapes from the last frame?" + lastFrame + "-" + controlsPanel.getCurrentFrame().intValue()))
+									if (MessageDialog.openQuestion(view.getSite().getShell(), Messages.PLAYER_COPY_SHAPES_TITLE, Messages.PLAYER_COPY_SHAPES_TEXT))
 										video.copyAnimations(lastFrame, controlsPanel.getCurrentFrame().intValue());
 							}
 							
@@ -383,29 +362,22 @@ public class ActivaPlayer extends BaseVlcj {
 		return -1;
 	}
 	
-//	public BufferedImage getSnapshot(){
-//		if (player != null)
-//			return player.getSnapshot();
-//		
-//		return null;
-//	}
-	
 	public BufferedImage getTemplate(Rectangle rectangle, File outputfile) {
 		Rectangle fixed = fix(rectangle);
 		BufferedImage template = null;
 		try {
 			BufferedImage snapshot = player.getSnapshot();
 			if (snapshot == null) {
-				logger.logError("Snapshot not taken");
+				logger.error(Messages.PLAYER_SNAPSHOT_ERROR);
 				return null;
 			}
 			template = snapshot.getSubimage(fixed.x, fixed.y, fixed.width, fixed.height);
 			
 			if (outputfile != null)
-				ImageIO.write(template, "jpg", outputfile);
+				ImageIO.write(template, Constants.File.SNAPSHOT_FILE_FORMAT, outputfile);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return template;
 	}
@@ -415,6 +387,9 @@ public class ActivaPlayer extends BaseVlcj {
 	}
 			
 	private Rectangle fix(Rectangle rectangle) {
+		//TODO problem when y + height is greater thant the actual size of the video
+		//we should put y or height at the limit, depends wich one is outside 
+		//also applies for x + width
 		return new Rectangle(adjustXToVideo(rectangle.x), 
 				adjustYToVideo(rectangle.y), 
 				adjustXToVideoNoCorrection(rectangle.width), 
@@ -472,7 +447,8 @@ public class ActivaPlayer extends BaseVlcj {
 	}
 	
 	
-//de estas hay que buscar que se puede configurar, yo creo que muchas ya estan en forma de sets
+//TODO descartar las siguientes opciones:
+	
 //		player.addMediaOptions(paramArrayOfString);
 //		player.setStandardMediaOptions(options);
 //		System.out.println("aspect ratio: " + player.getAspectRatio());
@@ -486,4 +462,8 @@ public class ActivaPlayer extends BaseVlcj {
 //		player.skip(199); //salta al tiempo actual + 199 ms
 //		player.setPosition(14f); //salta a la posicion 14
 //		System.out.println("dimension :" +player.getVideoDimension());
+	//System.out.println(player.getSnapshot());
+	//System.out.println(player.getVideoSurfaceContents());
+	//System.out.println(player.getVideoDimension());
+	
 }

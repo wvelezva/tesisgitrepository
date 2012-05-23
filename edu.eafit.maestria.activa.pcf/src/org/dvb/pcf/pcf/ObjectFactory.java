@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+
 import org.dvb.pcf.pcf_types.ExternalBodyType;
 import org.dvb.pcf.pcf_types.HexBinaryDataType;
 import org.dvb.pcf.pcf_types.MetaPropertyType;
@@ -156,6 +157,7 @@ public class ObjectFactory {
     private final static QName _Pixel_QNAME = new QName("http://www.dvb.org/pcf/pcf", "Pixel");
     private final static QName _Table_QNAME = new QName("http://www.dvb.org/pcf/pcf", "Table");
     private final static QName _Background_QNAME = new QName("http://www.dvb.org/pcf/pcf", "Background");
+    private final static QName _Trigger_QNAME = new QName("http://www.dvb.org/pcf/pcf", "Trigger");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.dvb.pcf.pcf
@@ -2276,4 +2278,8 @@ public class ObjectFactory {
         return new JAXBElement<Background>(_Background_QNAME, Background.class, null, value);
     }
 
+//    @XmlElementDecl(namespace = "http://www.dvb.org/pcf/pcf", name = "Trigger", substitutionHeadNamespace = "http://www.dvb.org/pcf/pcf-types", substitutionHeadName = "Map")
+//    public JAXBElement<Trigger> createTrigger(Trigger value) {
+//        return new JAXBElement<Trigger>(_Trigger_QNAME, Trigger.class, null, value);
+//    }
 }

@@ -23,7 +23,7 @@
 		o algo mas complejo con transaction pag 157-158 -->
 		<pcf:OnEvent name="press_ok"> 
 			<pcf:Trigger eventtype="KeyEvent"> 
-				<pcf:UserKey name="key" value="VK_ACCEPT"/>
+				<pcf:UserKey name="key" value="VK_ENTER"/>
 			</pcf:Trigger>
 			<pcf:SceneNavigate> 
 				<pcf:URI name="target" value="#../../main"/> 
@@ -32,7 +32,7 @@
 
 		<pcf:OnEvent name="exit"> 
 			<pcf:Trigger eventtype="KeyEvent"> 
-				<pcf:UserKey name="key" value="VK_PREV"/>
+				<pcf:UserKey name="key" value="VK_COLORED_KEY_0"/>
 			</pcf:Trigger>
 			<pcf:SceneNavigate> 
 				<pcf:URI name="target" value="#../../main"/> 

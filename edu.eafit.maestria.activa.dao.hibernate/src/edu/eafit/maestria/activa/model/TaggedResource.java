@@ -8,6 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * Represents a resource and its tag and tagging entity
  */
@@ -140,10 +142,8 @@ public class TaggedResource implements ITaggedResource
 	@Override
 	public int hashCode()
 	{
-		//FIXME quitar el comentario 
-//		return new HashCodeBuilder(23, 37).append(getResource() != null ? getResource().getResourceId() : 0).
-//				append(getTag() != null ? getTag().getName() : "").toHashCode();
-		return 0;
+		return new HashCodeBuilder(23, 37).append(getResource() != null ? getResource().getResourceId() : 0).
+				append(getTag() != null ? getTag().getName() : "").toHashCode();
 	}
 	
 }

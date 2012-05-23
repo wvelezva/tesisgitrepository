@@ -28,7 +28,6 @@ public class GeneralPage extends FieldEditorPreferencePage implements IWorkbench
 	// checkState allow you to perform validations
 	@Override
 	protected void checkState() {
-		//super.checkState();
 		if (!isDirValid()) {
 			setErrorMessage(directoryFieldEditor.getErrorMessage());
 			setValid(false);
@@ -68,7 +67,6 @@ public class GeneralPage extends FieldEditorPreferencePage implements IWorkbench
 	public void createFieldEditors() {
 		directoryFieldEditor = new DirectoryFieldEditor(Constants.Preferences.WORKSPACE, Messages.PREFERENCES_GENERAL_WORKSPACE, getFieldEditorParent());
 		directoryFieldEditor.setEmptyStringAllowed(false);
-		//directoryFieldEditor.setChangeButtonText("Abra cadaba");
 		isDirValid();
 		addField(directoryFieldEditor);
 	}

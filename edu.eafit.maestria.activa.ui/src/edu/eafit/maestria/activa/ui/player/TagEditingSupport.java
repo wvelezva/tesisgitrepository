@@ -34,11 +34,8 @@ public class TagEditingSupport extends EntityEditingSupport {
 				
 				entityWrapper.getTaggedResources().add(newTaggedResourceWrapper);
 				entityWrapper.getTaggedResources().add(taggedResourceWrapper);
-				//entityWrapper.helperProperty();
 			}
-		} else {
-			//taggedResourceWrapper.setTag();
-		}
+		} 
 		viewer.refresh();
 	}
 

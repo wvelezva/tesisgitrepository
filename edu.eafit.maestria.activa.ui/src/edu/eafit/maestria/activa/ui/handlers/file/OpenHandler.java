@@ -8,6 +8,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 
@@ -22,7 +23,7 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class OpenHandler extends AbstractHandler implements IHandler {
 
-	LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), OpenHandler.class);
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -31,8 +32,8 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 		try {
 			saved = (Boolean) handlerService.executeCommand(SaveDialogHandler.commandId, null);
 		} catch (Exception e) {
-			logger.logFatal(e);
-			HandlerUtil.getActiveWorkbenchWindow(event).close();
+			logger.fatal(e, Messages.COMMAND_FILE_SAVE_ERROR);
+			PlatformUI.getWorkbench().close();
 		}
 		
 		if (saved.booleanValue()) {
@@ -49,6 +50,9 @@ public class OpenHandler extends AbstractHandler implements IHandler {
 				Container.setProject(project);
 				ActivaPlayer.getInstance().prepareMedia(project.getVideo());
 			}
+		} else {
+			logger.fatal(Messages.COMMAND_FILE_SAVE_ERROR);
+			PlatformUI.getWorkbench().close();
 		}
 		
 		return null;

@@ -13,11 +13,12 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
 
 import edu.eafit.maestria.activa.dao.hibernate.DAOActivator;
+import edu.eafit.maestria.activa.dao.hibernate.Messages;
 import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class HibernateTemplate extends HibernateAccessor{
 
-	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName(), HibernateTemplate.class);
+	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName());
 	private Session session;
 	private static HibernateTemplate hibernateTemplate;
 	
@@ -120,7 +121,7 @@ public class HibernateTemplate extends HibernateAccessor{
 		boolean createdTransaction = false;
 		Transaction tx = null;
 		if (existingTransaction) {
-			logger.logInfo("Found thread-bound Session for HibernateTemplate");
+			logger.info(Messages.THREAD_BOUND_SESSION);
 		} else {
 			tx = session.beginTransaction();
 			existingTransaction = true;
@@ -145,7 +146,7 @@ public class HibernateTemplate extends HibernateAccessor{
 			throw ex;
 		}
 		finally {
-			logger.logInfo("Not closing pre-bound Hibernate Session after HibernateTemplate");
+			logger.info(Messages.NOT_CLOSING_PREBOUND_SESSION);
 			disableFilters(session);
 			if (previousFlushMode != null) {
 				session.setFlushMode(previousFlushMode);
@@ -160,7 +161,6 @@ public class HibernateTemplate extends HibernateAccessor{
 	 */
 	protected void prepareCriteria(Criteria criteria) {
 		criteria.setCacheable(true);
-		//criteria.settimeout();
 	}
 	
 	//-------------------------------------------------------------------------

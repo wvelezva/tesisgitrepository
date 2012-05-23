@@ -16,20 +16,15 @@ import edu.eafit.maestria.activa.services.ResourceServicesImpl;
 import edu.eafit.maestria.activa.services.TypeServicesImpl;
 
 public class Container extends DefaultPicoContainer{
+	private static final long serialVersionUID = 5447807520969643660L;
+	
 	private static Container container = new Container();
 	private static Project project;
 	
 	private Container(){
 	}
 	
-//	public static Container getInstance(){
-//		return container;
-//	}
-	
 	public static void init() {
-	//		.addComponent(IProjectServices.class, ProjectServicesImpl.class, new Parameter[0]);
-			//esta es otra forma de declarar un singleton en un enum,y funciona en el container
-//			.addComponent(ProjectServicesEnum.INSTANCE);
 			
 		//DAOs
 		container.addComponent(HibernateUtil.getSession())

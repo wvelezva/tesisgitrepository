@@ -34,7 +34,6 @@ public class PropertyKeyEditingSupport extends EntityEditingSupport {
 				
 				entityWrapper.getProperties().add(newPropertyWrapper);
 				entityWrapper.getProperties().add(propertyWrapper);
-				//entityWrapper.helperProperty();
 			}
 		} else {
 			propertyWrapper.setKey((String)value);

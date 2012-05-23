@@ -13,11 +13,13 @@ import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
 
 public class OpticalFlowHandler extends TrackerHandler {
 
+	private static final String METHOD_NAME = "Optical Flow";
 	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
+	
 	
 	@Override
 	public String getMethodName() {
-		return "Optical Flow";
+		return METHOD_NAME;
 	}
 	@Override
 	public List<Shape> track(Tracker tracker, long currentTime, Shape shape,	BufferedImage template, boolean saveImages) {

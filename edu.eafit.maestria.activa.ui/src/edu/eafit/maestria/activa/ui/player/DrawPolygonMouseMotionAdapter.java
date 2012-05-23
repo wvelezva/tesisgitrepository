@@ -12,9 +12,6 @@ public class DrawPolygonMouseMotionAdapter extends ActivaMouseMotionAdapter{
 	
     @Override
     public void mouseMoved(MouseEvent e) {
-    	if (overlay.isDrawing()) {
-    		//hay que hacer que dibuje una linea
-    	}
     	overlay.repaint();
     }
 	

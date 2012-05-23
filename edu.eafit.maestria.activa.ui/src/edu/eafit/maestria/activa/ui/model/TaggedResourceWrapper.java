@@ -10,6 +10,9 @@ import edu.eafit.maestria.activa.model.ITaggedResource;
 
 public class TaggedResourceWrapper implements ITaggedResource {
 
+	private static final String TAG = "tag";
+	private static final String ENTITY = "entity";
+	private static final String RESOURCE = "resource";
 	private ITaggedResource wrappedTaggedResource;
 	private EntityWrapper entityWrapper;
 	
@@ -35,7 +38,7 @@ public class TaggedResourceWrapper implements ITaggedResource {
 
 	@Override
 	public void setResource(IResource resource) {
-		propertyChangeSupport.firePropertyChange("resource", wrappedTaggedResource.getResource(), resource);
+		propertyChangeSupport.firePropertyChange(RESOURCE, wrappedTaggedResource.getResource(), resource);
 		wrappedTaggedResource.setResource(resource);
 
 	}
@@ -47,7 +50,7 @@ public class TaggedResourceWrapper implements ITaggedResource {
 
 	@Override
 	public void setEntity(IEntity entity) {
-		propertyChangeSupport.firePropertyChange("entity", wrappedTaggedResource.getEntity(), entity);
+		propertyChangeSupport.firePropertyChange(ENTITY, wrappedTaggedResource.getEntity(), entity);
 		wrappedTaggedResource.setEntity(entity);
 	}
 
@@ -58,7 +61,7 @@ public class TaggedResourceWrapper implements ITaggedResource {
 
 	@Override
 	public void setTag(IResourceTag tag) {
-		propertyChangeSupport.firePropertyChange("tag", wrappedTaggedResource.getTag(), tag);
+		propertyChangeSupport.firePropertyChange(TAG, wrappedTaggedResource.getTag(), tag);
 		wrappedTaggedResource.setTag(tag);
 	}
 

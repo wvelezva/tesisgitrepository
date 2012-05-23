@@ -10,7 +10,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.services.IProjectServices;
-import edu.eafit.maestria.activa.ui.UIActivator;
 import edu.eafit.maestria.activa.ui.utils.Messages;
 
 public class SaveDialogHandler extends AbstractHandler implements IHandler {
@@ -21,7 +20,10 @@ public class SaveDialogHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Project project = Container.getProject();
 		if (project != null && project.isModified()) {
-			MessageDialog messageDialog = new MessageDialog(HandlerUtil.getActiveShell(event), "TEXTO PARA EL TITULO", null, Messages.COMMAND_FILE_SAVE_PROJECT_MSG, MessageDialog.QUESTION, 
+			MessageDialog messageDialog = new MessageDialog(HandlerUtil.getActiveShell(event), 
+					Messages.COMMAND_FILE_SAVE_PROJECT_TITLE, null, 
+					Messages.COMMAND_FILE_SAVE_PROJECT_MSG, 
+					MessageDialog.QUESTION, 
 					new String[] { Messages.COMMAND_FILE_BUTTON_DONT_SAVE, Messages.COMMAND_FILE_BUTTON_CANCEL, Messages.COMMAND_FILE_BUTTON_SAVE }, 0);
 			int returnCode = messageDialog.open();
 			if  (returnCode == 2) {

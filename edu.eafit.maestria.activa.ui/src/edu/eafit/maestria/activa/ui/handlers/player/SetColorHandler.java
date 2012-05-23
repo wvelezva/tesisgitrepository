@@ -14,18 +14,19 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class SetColorHandler extends AbstractHandler implements IHandler {
 
-	private final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), SetColorHandler.class);
+	private static final String PARAM_COLOR = "activa.ui.param.color";
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String name = event.getParameter("activa.ui.param.color");
+		String name = event.getParameter(PARAM_COLOR);
 		
 		try {
 			Field field = Color.class.getField(name);
 			Color color = (Color)field.get(null);
 			ActivaPlayer.getInstance().getOverlay().setCurrentColor(color);
 		} catch (Exception e) {
-			logger.logError(e);
+			logger.warning(e);
 			ActivaPlayer.getInstance().getOverlay().setCurrentColor(Color.red);
 		}
 		

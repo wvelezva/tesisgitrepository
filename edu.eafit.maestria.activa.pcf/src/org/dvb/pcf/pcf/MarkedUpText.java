@@ -63,7 +63,7 @@ public class MarkedUpText
     extends PcfItemType
 {
 
-    @XmlElement(namespace = "http://www.dvb.org/pcf/x-dvb-pcf")
+    @XmlElement(namespace = "http://www.dvb.org/pcf/pcf")
     protected Body body;
     @XmlElementRef(name = "MetaProperty", namespace = "http://www.dvb.org/pcf/pcf-types", type = JAXBElement.class, required = false)
     protected List<JAXBElement<?>> metaProperty;

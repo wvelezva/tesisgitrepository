@@ -13,7 +13,7 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class TaggedResourceDaoImpl extends BaseDaoHibernate<ITaggedResource> implements ITaggedResourceDao {
 
-	private static LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName(), TaggedResourceDaoImpl.class);
+	private static final LogUtil logger = LogUtil.getInstance(DAOActivator.getDefault().getBundle().getSymbolicName());
 	
 	public TaggedResourceDaoImpl(Session session) {
 		super(session, TaggedResource.class);
@@ -25,7 +25,7 @@ public class TaggedResourceDaoImpl extends BaseDaoHibernate<ITaggedResource> imp
 		try {
 			resourceTag = ResourceTag.valueOf(tag);
 		} catch (IllegalArgumentException e) {
-			logger.logWarning("The tag doesn't exist");
+			logger.warning(Messages.TAG_NOT_EXISTS, ResourceTag.ATTACHMENT);
 		}
 		if (resourceTag == null)
 			resourceTag = ResourceTag.ATTACHMENT;

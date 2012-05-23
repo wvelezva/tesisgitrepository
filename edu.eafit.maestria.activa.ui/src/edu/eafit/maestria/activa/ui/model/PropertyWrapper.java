@@ -6,6 +6,8 @@ import java.beans.PropertyChangeSupport;
 import edu.eafit.maestria.activa.model.IProperty;
 
 public class PropertyWrapper implements IProperty{
+	private static final String VALUE = "value";
+	private static final String KEY = "key";
 	private IProperty wrappedProperty;
 	private EntityWrapper entityWrapper;
 	
@@ -28,14 +30,14 @@ public class PropertyWrapper implements IProperty{
 		return wrappedProperty.getKey();
 	}
 	public void setKey(String key) {
-		propertyChangeSupport.firePropertyChange("key", wrappedProperty.getKey(), key);
+		propertyChangeSupport.firePropertyChange(KEY, wrappedProperty.getKey(), key);
 		wrappedProperty.setKey(key);
 	}
 	public String getValue() {
 		return wrappedProperty.getValue();
 	}
 	public void setValue(String value) {
-		propertyChangeSupport.firePropertyChange("value", wrappedProperty.getValue(), value);
+		propertyChangeSupport.firePropertyChange(VALUE, wrappedProperty.getValue(), value);
 		wrappedProperty.setValue(value);
 	}
 

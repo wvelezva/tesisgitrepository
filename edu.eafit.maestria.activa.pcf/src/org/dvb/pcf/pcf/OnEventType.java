@@ -52,11 +52,11 @@ public class OnEventType
     extends PcfItemType
 {
 
-    @XmlElement(name = "Trigger", required = true)
+    @XmlElement(name = "Trigger", namespace = "http://www.dvb.org/pcf/pcf", required = true)
     protected Trigger trigger;
     @XmlElement(name = "Guard")
     protected Guard guard;
-    @XmlElement(name = "ActionLanguage")
+    @XmlElement(name = "ActionLanguage", namespace = "http://www.dvb.org/pcf/pcf")
     protected ActionLanguage actionLanguage;
     @XmlElementRef(name = "ActionLanguageShortcuts", namespace = "http://www.dvb.org/pcf/pcf", type = JAXBElement.class, required = false)
     protected JAXBElement<?> actionLanguageShortcuts;

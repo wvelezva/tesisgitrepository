@@ -5,6 +5,8 @@
 // Generated on: 2012.03.27 at 06:52:02 AM COT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "pcftypes", namespaceURI="http://www.dvb.org/pcf/pcf-types")}, 
-										elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+		xmlns = { 
+				@javax.xml.bind.annotation.XmlNs(prefix = "pcftypes", namespaceURI="http://www.dvb.org/pcf/pcf-types")
+		})
 package org.dvb.pcf.pcf_types;

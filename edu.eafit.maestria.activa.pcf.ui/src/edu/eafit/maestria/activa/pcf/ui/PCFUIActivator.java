@@ -10,7 +10,6 @@ public class PCFUIActivator extends Activator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		// TODO Auto-generated method stub
 		super.start(context);
 		Container.add(PCFServicesImpl.class);
 	}

@@ -2,9 +2,6 @@ package edu.eafit.maestria.activa.ui.handlers.detect;
 
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +18,10 @@ import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.services.AnimationUtils;
 import edu.eafit.maestria.activa.tracking.Tracker;
 import edu.eafit.maestria.activa.ui.player.ActivaPlayer;
-import edu.eafit.maestria.activa.utilities.Constants;
+import edu.eafit.maestria.activa.ui.utils.Messages;
 
 public abstract class TrackerHandler extends AbstractHandler implements IHandler {
 
-	private final DecimalFormat templateNumberFormat = new DecimalFormat(Constants.Template.TEMPLATE_FILE_NAME_FORMAT);
 	private ActivaPlayer activaPlayer = ActivaPlayer.getInstance();
 	
 	@Override
@@ -34,7 +30,7 @@ public abstract class TrackerHandler extends AbstractHandler implements IHandler
 		List<Animation> selected = new ArrayList<Animation>();
 		AnimationUtils.getSelected(activaPlayer.getOverlay().getAnimations(), selected);
 		if (selected == null || selected.isEmpty()) {
-			MessageDialog.openInformation(HandlerUtil.getActiveShell(event), getMethodName(), "There is no form selected");
+			MessageDialog.openInformation(HandlerUtil.getActiveShell(event), getMethodName(), Messages.TRACKING_NO_OBJECT_SELECTED);
 			return null;
 		}
 		Animation animation = selected.get(0);
@@ -42,7 +38,6 @@ public abstract class TrackerHandler extends AbstractHandler implements IHandler
 		Shape shape = animation.getShape(activaPlayer.getCurrentFrame());
 		long currentTime = activaPlayer.getCurrentTime();
 		
-		//BufferedImage template = activaPlayer.getTemplate(shape.getBounds(), getOutPut(currentTime));
 		BufferedImage template = activaPlayer.getTemplate(shape.getBounds());
 		
 		Video video = Container.getProject().getVideo();
@@ -56,21 +51,9 @@ public abstract class TrackerHandler extends AbstractHandler implements IHandler
 				video.addAnimation(i, animation);
 			}
 		} else {
-			MessageDialog.openInformation(HandlerUtil.getActiveShell(event), getMethodName(), "No MATCHES found");
+			MessageDialog.openInformation(HandlerUtil.getActiveShell(event), getMethodName(), Messages.TRACKING_NO_MATCHES);
 		}
 		return null;
-	}
-
-	private File getOutPut(long currentTime) {
-		String id = templateNumberFormat.format(currentTime);
-		String fileName = Container.getProject().getVideo().getSnapshotDirectory().getAbsolutePath() + File.separator + id + Constants.Template.TEMPLATE;
-		File outputfile = null;
-		try {
-			outputfile = File.createTempFile(fileName, Constants.Template.TEMPLATE_FILE_EXTENSION);
-		} catch (IOException e) {
-			
-		}
-		return outputfile;
 	}
 
 	public abstract String getMethodName();

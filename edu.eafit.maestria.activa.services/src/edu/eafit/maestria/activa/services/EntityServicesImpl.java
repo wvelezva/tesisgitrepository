@@ -59,5 +59,10 @@ public class EntityServicesImpl implements IEntityServices {
 		}
 		return null;
 	}
+	
+	@Override
+	public List<IEntity> getEntities(){
+		return entityDao.getEntities();
+	}
 
 }

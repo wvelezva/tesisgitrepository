@@ -27,14 +27,11 @@ public class Player extends ViewPart {
 		
 		properties = new Properties(parent, SWT.NONE);
 		
-		//properties.setEntity(((IEntityServices)Container.getInstance().getComponent(IEntityServices.class)).newEntity());
-		
 		Composite player = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE);
 		RowLayout playerLayout = new RowLayout(SWT.VERTICAL);
 		player.setLayout(playerLayout);
 		
 		ActivaPlayer.getInstance().createUI(player, this);
-		
 	}
 	
 	public IEntity getEntity(){
@@ -46,7 +43,6 @@ public class Player extends ViewPart {
 	}
 	
 	public void setFocus() {
-		//messageText.setFocus();
 	}
 	
 	public void loadEntity(Animation animation){

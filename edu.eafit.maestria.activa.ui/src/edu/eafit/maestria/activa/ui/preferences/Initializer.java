@@ -12,36 +12,29 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class Initializer extends AbstractPreferenceInitializer {
 
-	private static LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName(), Initializer.class);
+	private static final LogUtil logger = LogUtil.getInstance(UIActivator.getDefault().getBundle().getSymbolicName());
 	
-	public Initializer() {
-		// TODO Auto-generated constructor stub
-	}
+	public Initializer() {}
 
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = UIActivator.getDefault().getPreferenceStore();
 		initializeWorkspace(store);
-		//initializeFormats(store);
 	}
 
 	private void initializeWorkspace(IPreferenceStore store) {
-		String workingDirectoryPath = System.getProperty("user.home") + System.getProperty("file.separator") + "activa_projects";
+		String workingDirectoryPath = System.getProperty("user.home") + File.separator + Constants.Preferences.HOME;
 		File dir = new File(workingDirectoryPath);
 		boolean canWritePref = true;
 		if (!dir.exists())
 			canWritePref = dir.mkdir();
 		else if (!dir.isDirectory()) {
-			logger.logError(Messages.PREFERENCES_GENERAL_ERROR_WORKSPACE_INVALID);
+			logger.error(Messages.PREFERENCES_GENERAL_ERROR_WORKSPACE_INVALID);
 			canWritePref = false;
 		}
 			
 		if (canWritePref)
 			store.setDefault(Constants.Preferences.WORKSPACE, workingDirectoryPath);
 	}
-	
-//	private void initializeFormats(IPreferenceStore store) {
-//		store.setDefault(Constants.Preferences.SUPPORTED_FORMATS, "");
-//	}
 
 }

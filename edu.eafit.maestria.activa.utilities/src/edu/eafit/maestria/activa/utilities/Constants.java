@@ -1,7 +1,10 @@
 package edu.eafit.maestria.activa.utilities;
 
-//FIXME revisar que constantes no se usan en mas de un lugar y entonces si solo son usadas en una parte llevarlas alla donde se usan
 public final class Constants {
+	
+	public final class Config {
+		public static final String ACTIVA_LOG_PROPERTY = "activa.log";
+	}
 	
 	public final class File {
 		public static final String PROJECT_FILE_EXTENSION = ".activa.xml";		
@@ -12,16 +15,17 @@ public final class Constants {
 		public static final String SNAPSHOT_FILE_NAME_FORMAT = "000000";
 		public static final String THUMBNAIL = "-thumb";
 		public static final String ENTITY = "-entity";
-		public static final String SNAPSHOT_FILE_EXTENSION=".png";
+		public static final String SNAPSHOT_FILE_FORMAT="jpg";
+		public static final String SNAPSHOT_FILE_EXTENSION="." + SNAPSHOT_FILE_FORMAT;
 	}
 	
 	public final class Template {
 		public static final String TEMPLATE = "-template";
 		public static final String TEMPLATE_FILE_NAME_FORMAT = "00000000000";
-		public static final String TEMPLATE_FILE_EXTENSION=".jpg";
 	}
 	
 	public final class Preferences {
+		public static final String HOME = "activa_projects";
 		public static final String WORKSPACE = "workspace";
 		public static final String SUPPORTED_FORMATS = "supportedFormats";
 		public static final String SCALE = "scale";
@@ -32,5 +36,6 @@ public final class Constants {
 		public static final int WIDTH = 720;
 		public static final int HEIGHT = 576;
 		public static final int THUMBNAIL_WIDTH = 200;
+		public static final int MILLIS_IN_SECONDS = 1000;
 	}
 }

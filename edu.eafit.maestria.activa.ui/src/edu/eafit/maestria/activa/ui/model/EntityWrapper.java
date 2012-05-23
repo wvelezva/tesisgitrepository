@@ -15,6 +15,12 @@ import edu.eafit.maestria.activa.services.IResourceServices;
 
 public class EntityWrapper implements IEntity {
 
+	private static final String TAGGED_RESOURCES = "taggedResources";
+	private static final String PROPERTIES = "properties";
+	public static final String DESCRIPTION = "description";
+	public static final String NAME = "name";
+	private static final String TYPE = "type";
+	private static final String ENTITY_ID = "entityId";
 	private IEntity entity;
 	private List<IProperty> propertiesWrapped;
 	private List<ITaggedResource> taggedResourcesWrapped;
@@ -50,7 +56,7 @@ public class EntityWrapper implements IEntity {
 	
 	@Override
 	public void setEntityId(long entityId) {
-		propertyChangeSupport.firePropertyChange("entityId", this.entity.getEntityId(),	entityId);
+		propertyChangeSupport.firePropertyChange(ENTITY_ID, this.entity.getEntityId(),	entityId);
 		this.entity.setEntityId(entityId);
 	}
 
@@ -61,7 +67,7 @@ public class EntityWrapper implements IEntity {
 
 	@Override
 	public void setType(IType type) {
-		propertyChangeSupport.firePropertyChange("type", this.entity.getType(),	type);
+		propertyChangeSupport.firePropertyChange(TYPE, this.entity.getType(),	type);
 		this.entity.setType(type);
 	}
 
@@ -77,7 +83,7 @@ public class EntityWrapper implements IEntity {
 
 	@Override
 	public void setName(String name) {
-		propertyChangeSupport.firePropertyChange("name", this.entity.getName(),	name);
+		propertyChangeSupport.firePropertyChange(NAME, this.entity.getName(),	name);
 		this.entity.setName(name);
 	}
 
@@ -88,7 +94,7 @@ public class EntityWrapper implements IEntity {
 
 	@Override
 	public void setDescription(String description) {
-		propertyChangeSupport.firePropertyChange("description", this.entity.getDescription(), description);
+		propertyChangeSupport.firePropertyChange(DESCRIPTION, this.entity.getDescription(), description);
 		this.entity.setDescription(description);
 	}
 
@@ -99,7 +105,7 @@ public class EntityWrapper implements IEntity {
 	
 	@Override
 	public void setProperties(List<IProperty> properties) {
-		propertyChangeSupport.firePropertyChange("properties", this.entity.getProperties(),	properties);
+		propertyChangeSupport.firePropertyChange(PROPERTIES, this.entity.getProperties(),	properties);
 		this.entity.setProperties(properties);
 
 	}
@@ -111,7 +117,7 @@ public class EntityWrapper implements IEntity {
 
 	@Override
 	public void setTaggedResources(List<ITaggedResource> taggedResources) {
-		propertyChangeSupport.firePropertyChange("taggedResources", this.entity.getTaggedResources(), taggedResources);
+		propertyChangeSupport.firePropertyChange(TAGGED_RESOURCES, this.entity.getTaggedResources(), taggedResources);
 		this.entity.setTaggedResources(taggedResources);
 	}
 
@@ -128,6 +134,5 @@ public class EntityWrapper implements IEntity {
 		IResourceServices resourceServices = (IResourceServices)Container.get(IResourceServices.class);
 		resourceServices.deleteTaggedResource(taggedResource.getWrappedTaggedResource());
 	}
-
 
 }

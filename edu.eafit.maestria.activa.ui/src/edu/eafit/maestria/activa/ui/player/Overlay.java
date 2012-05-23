@@ -39,7 +39,8 @@ public class Overlay extends Window {
     private Color currentColor = Color.red;
     
 	public Overlay(Window owner) {
-		super(owner);//, WindowUtils.getAlphaCompatibleGraphicsConfiguration());
+		super(owner);
+		//super(owner, WindowUtils.getAlphaCompatibleGraphicsConfiguration());
 		AWTUtilities.setWindowOpaque(this, false);
 //		setBackground(Color.blue);
 //		AWTUtilities.setWindowOpacity(this, 0.9f);

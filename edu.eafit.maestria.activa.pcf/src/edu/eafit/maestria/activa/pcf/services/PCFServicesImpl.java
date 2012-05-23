@@ -3,10 +3,10 @@ package edu.eafit.maestria.activa.pcf.services;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dvb.pcf.pcf.ActionLanguage;
 import org.dvb.pcf.pcf.Audio;
 import org.dvb.pcf.pcf.BooleanVar;
+import org.dvb.pcf.pcf.Collection;
 import org.dvb.pcf.pcf.Color;
 import org.dvb.pcf.pcf.MarkedUpText;
 import org.dvb.pcf.pcf.ObjectFactory;
@@ -37,21 +38,10 @@ import org.dvb.pcf.pcf.UserKey;
 import org.dvb.pcf.pcf.Video;
 import org.dvb.pcf.pcf_types.ComponentType;
 import org.dvb.pcf.pcf_types.ExternalBodyType;
-import org.dvb.pcf.x_dvb_pcf.A;
-import org.dvb.pcf.x_dvb_pcf.Body;
-import org.dvb.pcf.x_dvb_pcf.Em;
-import org.dvb.pcf.x_dvb_pcf.Img;
-import org.dvb.pcf.x_dvb_pcf.P;
-import org.dvb.pcf.x_dvb_pcf.Table;
-import org.dvb.pcf.x_dvb_pcf.Td;
-import org.dvb.pcf.x_dvb_pcf.Tr;
 
 import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
-import edu.eafit.maestria.activa.model.IProperty;
-import edu.eafit.maestria.activa.model.IResource;
-import edu.eafit.maestria.activa.model.ITaggedResource;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.model.ShapeKind;
 import edu.eafit.maestria.activa.pcf.PCFActivator;
@@ -63,10 +53,45 @@ import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class PCFServicesImpl implements IInteroperableFormatServices {
 
+
+	private static final LogUtil logger = LogUtil.getInstance(PCFActivator.getDefault().getBundle().getSymbolicName());
+
+	private static final String ENTITY_DETAIL_TEMPLATE_FILE = "resources/entityDetail.xml";
+	private static final String NEXT_ESCENE_FIELD_VALUE = "#../entityDetail";
+	private static final String TEXT_XML_MIME_TYPE = "text/xml";
+	private static final String NEXT_SCENE_FIELD_NAME = "next_scene";
+	private static final String MAIN_SCENE_NAME = "main";
+	private static final String ACTION_LANGUAGE_NAME = "show";
+	private static final String KEY_FIELD_NAME = "key";
+	private static final String KEY_EVENT_TYPE = "KeyEvent";
+	private static final String EVENT_NAME = "select";
+	private static final String BORDERCOLOR_FIELD_NAME = "bordercolor";
+	private static final String CONTEXT_ORIGINAL = "original";
+	private static final String VERTEX_FIELD_NAME = "vertex_";
+	private static final String SIZE_FIELD_NAME = "size";
+	private static final String ENTITY_FIELD_NAME = "entity_";
+	private static final String ANIMATION_FIELD_NAME = "animation_";
+	private static final String ANIMATION_PATH = "#../../../" + ANIMATION_FIELD_NAME;
+	private static final String ORIGIN_POSITION_FIELD_NAME = "origin";
+	private static final String ORIGIN_POSITION_PATH = "#../" + ORIGIN_POSITION_FIELD_NAME;
+	private static final String FRAMES_FIELD_NAME = "frames";
+	private static final String FPS_FIELD_NAME = "fps";
+	private static final String COLLECTION_NAME = "timestamp_";
+	private static final String FIRST_SCENE_FIELD_NAME = "firstScene";
+	private static final String DEFAULT_AUDIO_FIELD_NAME = "default_audio";
+	private static final String DEFAULT_FULLSCREEN_VIDEO_FIELD_NAME = "default_fullscreen_video";
+	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	private static final String CONTENT = "content";
+	private static final String STREAM_NAME = "video";
+	private static final String REFERENCE_SCREEN_MAPPING_FIELD_VALUE = "display-anamorphic";
+	private static final String REFERENCE_SCREEN_MAPPING_FIELD_NAME = "referenceScreenMapping";
+	private static final String REFERENCE_SCREEN_FIELD_NAME = "referenceScreen";
+	private static final String PCF_SPEC_VERSION_FIELD_VALUE = "1.0";
+	private static final String PCF_SPEC_VERSION_FIELD_NAME = "pcfSpecVersion";
 	private static final String ENTITY_DETAIL_TEMPLATE = "-entityDetailTemplate";
-	private final LogUtil logger = LogUtil.getInstance(PCFActivator.getDefault().getBundle().getSymbolicName(), PCFServicesImpl.class);
-	private final String PCF_EXTENSION = ".pcf.xml";
-	private final String DIR_NAME ="pcf";
+	private static final String PCF_EXTENSION = ".pcf.xml";
+	private static final String DIR_NAME ="pcf";
+	
 	private ObjectFactory pcfFactory;
 	private org.dvb.pcf.x_dvb_pcf.ObjectFactory xdvbpcfFactory;
 	private IEntityServices entityServices;
@@ -85,6 +110,7 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 		PCF pcf = pcfFactory.createPCF();
 		Service service = createService(project);
 		
+		addTimestamps(project, service);
 		addShapes(project, service);
 		addEntities(project, service);
 		
@@ -102,51 +128,108 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 		service.setName(projectName);
 
 		org.dvb.pcf.pcf.String pcfSpecVersion = pcfFactory.createString();
-		pcfSpecVersion.setName("pcfSpecVersion");
-		pcfSpecVersion.setValue("1.0");
+		pcfSpecVersion.setName(PCF_SPEC_VERSION_FIELD_NAME);
+		pcfSpecVersion.setValue(PCF_SPEC_VERSION_FIELD_VALUE);
 		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createString(pcfSpecVersion));
 
 		Size referenceScreen = pcfFactory.createSize();
-		referenceScreen.setName("referenceScreen");
+		referenceScreen.setName(REFERENCE_SCREEN_FIELD_NAME);
 		referenceScreen.getValue().add(Constants.Player.WIDTH);
 		referenceScreen.getValue().add(Constants.Player.HEIGHT);
 		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createSize(referenceScreen));
 		
 		org.dvb.pcf.pcf.String referenceScreenMapping = pcfFactory.createString();
-		referenceScreenMapping.setName("referenceScreenMapping");
-		referenceScreenMapping.setValue("display-anamorphic");
+		referenceScreenMapping.setName(REFERENCE_SCREEN_MAPPING_FIELD_NAME);
+		referenceScreenMapping.setValue(REFERENCE_SCREEN_MAPPING_FIELD_VALUE);
 		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createString(referenceScreenMapping));
 		
-		//FIXME 
-		//hay que probar esto =
-		//new org.dvb.pcf.pcf_types.ObjectFactory().createEnumerationType(value);
+		org.dvb.pcf.pcf.Integer fps = pcfFactory.createInteger();
+		fps.setName(FPS_FIELD_NAME);
+		
+		fps.setValue(Float.valueOf(project.getVideo().getFps()).intValue());
+		
+		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createInteger(fps));
 		
 		Stream stream = pcfFactory.createStream();
-		stream.setName("video");
+		stream.setName(STREAM_NAME);
 		StreamData streamData = pcfFactory.createStreamData();
-		streamData.setName("content");
+		streamData.setName(CONTENT);
 		ExternalBodyType ebt = new org.dvb.pcf.pcf_types.ObjectFactory().createExternalBodyType();
-		ebt.setContentType("application/octet-stream");
+		ebt.setContentType(APPLICATION_OCTET_STREAM);
 		ebt.setUri(project.getVideo().getVideo().getName());
 		stream.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createExternalBody(ebt));
 		
 		Video video = pcfFactory.createVideo();
-		video.setName("default_fullscreen_video");
+		video.setName(DEFAULT_FULLSCREEN_VIDEO_FIELD_NAME);
 		stream.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createVideo(video));
 
 		Audio audio = pcfFactory.createAudio();
-		audio.setName("default_audio");
+		audio.setName(DEFAULT_AUDIO_FIELD_NAME);
 		stream.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createAudio(audio));
 		
 		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createStream(stream));
 		
 		URI firstSceneURI = pcfFactory.createURI();
-		firstSceneURI.setName("firstScene");
-		firstSceneURI.setValue("#main");
+		firstSceneURI.setName(FIRST_SCENE_FIELD_NAME);
+		firstSceneURI.setValue("#" + MAIN_SCENE_NAME);
 		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createURI(firstSceneURI));
 		
 		return service;
 	}
+
+	private void addTimestamps(Project project, Service service) {
+		Collection timestamps = pcfFactory.createCollection();
+		
+		for (Entry<Integer, List<Animation>> entry : project.getVideo().getAnimations().entrySet()) {
+			Collection timestamp = pcfFactory.createCollection();
+			timestamp.setName(COLLECTION_NAME + entry.getKey());
+			
+			org.dvb.pcf.pcf.Integer frame = pcfFactory.createInteger();
+			frame.setName(FRAMES_FIELD_NAME);
+//			millis.setValue(framesToMillis(project.getVideo().getFps(), entry.getKey()));
+			frame.setValue(entry.getKey());
+			
+			timestamp.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createInteger(frame));
+			boolean animationCreated = false;
+			for (Animation animation : entry.getValue()){
+				
+				if (animation.getEntityId() == 0)
+					continue;
+				
+				animationCreated = true;
+				Collection shapePCF = pcfFactory.createCollection();
+				Position origin = pcfFactory.createPosition();
+				origin.setName(ORIGIN_POSITION_FIELD_NAME);
+				java.awt.Shape shape = animation.getShape(entry.getKey());
+				origin.getValue().add(shape.getBounds().x);
+				origin.getValue().add(shape.getBounds().y);
+				shapePCF.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createPosition(origin));
+				
+				if (animation.getKind() == ShapeKind.RECTANGLE) { 
+					Rectangle r = pcfFactory.createRectangle();
+					r.setHref(ANIMATION_PATH + animation.getId());
+					shapePCF.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createRectangle(r));
+				} else if (animation.getKind() == ShapeKind.POLYGON) { 
+					Polygon p = pcfFactory.createPolygon();
+					p.setHref(ANIMATION_PATH + animation.getId());
+					shapePCF.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createPolygon(p));
+				}
+				
+				timestamp.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createCollection(shapePCF));
+			}
+			
+			if (animationCreated)
+				timestamps.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createCollection(timestamp));
+		}
+		service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createCollection(timestamps));
+	}
+	
+//	private Integer framesToMillis(float fps, Integer key) {
+//		float frameDuration = Constants.Player.MILLIS_IN_SECONDS/fps;
+//		double result = Math.ceil(key.floatValue() * frameDuration);
+//		
+//		return Integer.valueOf(Double.valueOf(result).intValue()); 
+//	}
 
 	private void addShapes(Project project, Service service) {
 		for (int i = 0; i < project.getVideo().getAllAnimations().size(); i++) {
@@ -160,10 +243,10 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 				continue;
 			
 			if (animation.getKind() == ShapeKind.RECTANGLE) { 
-				Rectangle r = createRectangle(animation, i);
+				Rectangle r = createRectangle(project, animation, i);
 				service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createRectangle(r));
 			} else if (animation.getKind() == ShapeKind.POLYGON) { 
-				Polygon p = createPolygon(animation, i);
+				Polygon p = createPolygon(project, animation, i);
 				service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createPolygon(p));
 			}
 		}
@@ -184,104 +267,25 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 			addedEntities.put(Long.valueOf(entity.getEntityId()), Long.valueOf(entity.getEntityId()));
 			
 			MarkedUpText entityRepresentation = pcfFactory.createMarkedUpText();
-			entityRepresentation.setName("entity_" + entity.getEntityId());
-			Body body = xdvbpcfFactory.createBody();
-			Table table = xdvbpcfFactory.createTable();
-			Tr tr = xdvbpcfFactory.createTr();
-			//image
-			Td td = xdvbpcfFactory.createTd();
-			td.setRowspan(new BigInteger("2"));
-			IResource image = entityServices.getEntityImage(entity);
-			if (image != null && image.getFile() != null) {
-				Img img = xdvbpcfFactory.createImg();
-				img.setSrc(image.getFile().getName());
-				img.setAlt(image.getName());
-				td.getContent().add(img);
-			}
-			tr.getThOrTd().add(td);
-			//name
-			td = xdvbpcfFactory.createTd();
-			td.setColspan(new BigInteger("2"));
-			P p = xdvbpcfFactory.createP();
-			p.getContent().add(entity.getName());
-			td.getContent().add(p);
-			tr.getThOrTd().add(td);
-			table.getTr().add(tr);
+			entityRepresentation.setName(ENTITY_FIELD_NAME + entity.getEntityId());
 			
-			//properties
-			if (entity.getProperties().size() > 0) {
-				tr = xdvbpcfFactory.createTr();
-				td = xdvbpcfFactory.createTd();
-				Table properties = xdvbpcfFactory.createTable();
-				Tr trProperties = xdvbpcfFactory.createTr();
-				Td tdProperties = xdvbpcfFactory.createTd();
-				tdProperties.setColspan(new BigInteger("2"));
-				Em em = xdvbpcfFactory.createEm();
-				em.getContent().add(Messages.PROPERTIES);
-				tdProperties.getContent().add(em);
-				trProperties.getThOrTd().add(tdProperties);
-				properties.getTr().add(trProperties);
-				for (IProperty property : entity.getProperties()) {
-					trProperties = xdvbpcfFactory.createTr();
-					//key
-					tdProperties = xdvbpcfFactory.createTd();
-					em = xdvbpcfFactory.createEm();
-					em.getContent().add(property.getKey());
-					tdProperties.getContent().add(em);
-					trProperties.getThOrTd().add(tdProperties);
-					//value
-					tdProperties = xdvbpcfFactory.createTd();
-					tdProperties.getContent().add(property.getValue());
-					trProperties.getThOrTd().add(tdProperties);
-					
-					properties.getTr().add(trProperties);
-				}
-				
-				td.getContent().add(properties);
-				tr.getThOrTd().add(td);
-			}
+			ExternalBodyType body = new ExternalBodyType();
+			body.setContentType(TEXT_XML_MIME_TYPE);
+			body.setUri(project.getTva().getSource().getName());
+			entityRepresentation.setExternalBody(pcfFactory.createExternalBody(body));
 			
-			//resources
-			if (entity.getTaggedResources().size() > 0) {
-				td = xdvbpcfFactory.createTd();
-				Em em = xdvbpcfFactory.createEm();
-				em.getContent().add(Messages.RESOURCES);
-				td.getContent().add(em);
-				for (ITaggedResource taggedResource : entity.getTaggedResources()){
-					td.getContent().add(xdvbpcfFactory.createBr());
-					A a = xdvbpcfFactory.createA();
-					a.setHref(taggedResource.getResource().getFile().getName());
-					a.getContent().add(taggedResource.getResource().getName());
-					td.getContent().add(a);
-				}
-				tr.getThOrTd().add(td);
-				table.getTr().add(tr);
-			}
-			
-			//description
-			tr = xdvbpcfFactory.createTr();
-			td = xdvbpcfFactory.createTd();
-			td.setColspan(new BigInteger("3"));
-			p = xdvbpcfFactory.createP();
-			p.getContent().add(entity.getDescription());
-			td.getContent().add(p);
-			tr.getThOrTd().add(td);
-			table.getTr().add(tr);
-			
-			body.getPOrHrOrTable().add(table);
-			entityRepresentation.setBody(body);
 			service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createMarkedUpText(entityRepresentation));		
 		}
 	}
 	
-	private Rectangle createRectangle(Animation animation, int index) {
+	private Rectangle createRectangle(Project project, Animation animation, int index) {
 		java.awt.Rectangle shape = (java.awt.Rectangle) animation.getShape(0);
 		Rectangle r = pcfFactory.createRectangle();
 		
-		createCommonProperties(animation, index, shape.x, shape.y, r);
+		createCommonProperties(project, animation, r);
 		
 		Size size = pcfFactory.createSize();
-		size.setName("size");
+		size.setName(SIZE_FIELD_NAME);
 		size.getValue().add(shape.width);
 		size.getValue().add(shape.height);
 		r.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createSize(size));
@@ -289,16 +293,16 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 		return r;
 	}
 
-	private Polygon createPolygon(Animation animation, int index) {
+	private Polygon createPolygon(Project project, Animation animation, int index) {
 		java.awt.Polygon shape = (java.awt.Polygon) animation.getShape(0);
 		Polygon p = pcfFactory.createPolygon();
 		
-		createCommonProperties(animation, index, shape.xpoints[0], shape.ypoints[0], p);
+		createCommonProperties(project, animation, p);
 		
 		PositionArray vertexArray = pcfFactory.createPositionArray();
 		for (int i=1;i<shape.npoints;i++){
 			Position vertex = pcfFactory.createPosition();
-			vertex.setName("vertex_" + 1);
+			vertex.setName(VERTEX_FIELD_NAME + 1);
 			vertex.getValue().add(shape.xpoints[i]);
 			vertex.getValue().add(shape.ypoints[i]);
 			vertexArray.getPosition().add(vertex);
@@ -308,40 +312,46 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 		return p;
 	}
 
-	private void createCommonProperties(Animation animation, int index, int x, int y, ComponentType r) {
-		r.setName("animation_" + index);
+	private void createCommonProperties(Project project, Animation animation, ComponentType r) {
+		r.setName(ANIMATION_FIELD_NAME + animation.getId());
 		
 		Position origin = pcfFactory.createPosition();
-		origin.setName("origin");
-		origin.getValue().add(x);
-		origin.getValue().add(y);
+		origin.setHref(ORIGIN_POSITION_PATH);
+		origin.setContext(CONTEXT_ORIGINAL);
 		r.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createPosition(origin));
 		
 		Color borderColor = pcfFactory.createColor();
-		borderColor.setName("bordercolor");
-		borderColor.setValue("#" + Integer.toHexString(animation.getColor().getRGB()));
+		borderColor.setName(BORDERCOLOR_FIELD_NAME);
+		String hexColor = Integer.toHexString(animation.getColor().getRGB());
+		borderColor.setValue("#" + hexColor.substring(2) + hexColor.substring(0,2));
 		r.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createColor(borderColor));
 		
-		OnEventType oet = createEvent("select", animation);
+		OnEventType oet = createEvent(project, EVENT_NAME, animation);
 		r.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createOnEvent(oet));
 	}
 	
-	private OnEventType createEvent(String name, Animation animation) {
+	private OnEventType createEvent(Project project, String name, Animation animation) {
 		OnEventType oet = pcfFactory.createOnEventType();
 		oet.setName(name);
 		Trigger trigger = pcfFactory.createTrigger();
-		trigger.setEventtype("KeyEvent");
+		trigger.setEventtype(KEY_EVENT_TYPE);
+		
 		UserKey key = pcfFactory.createUserKey();
-		key.setName("key");
+		key.setName(KEY_FIELD_NAME);
 		key.setValue(getUserKey(animation.getColor()));
+		
 		trigger.getPrimitiveTypeValueOrConstructedTypeValueOrCompoundTypeValue().add(pcfFactory.createUserKey(key));
 		oet.setTrigger(trigger);
+		
 		ActionLanguage show = pcfFactory.createActionLanguage();
-		show.setName("show");
-		//show.setHref("#../showEntity");
+		show.setName(ACTION_LANGUAGE_NAME);
 		StringBuffer content = new StringBuffer();
 		content.append("entitySelected.content = entity_" + animation.getEntityId() + ".content;");
-		content.append("\nSceneNavigate(<uri>entityDetail</uri>,<enum>forget</enum>,nil);");
+		
+		String projectName = StringUtils.substringBeforeLast(project.getSource().getName(), Constants.File.PROJECT_FILE_EXTENSION);
+		String entityDetailTemplate = projectName + ENTITY_DETAIL_TEMPLATE + PCF_EXTENSION;
+		 
+		content.append("\nSceneNavigate(<uri>" + entityDetailTemplate + "#entityDetail</uri>,<enum>forget</enum>,nil);");
 		show.setContent(content.toString());
 		oet.setActionLanguage(show);
 		return oet;
@@ -361,11 +371,11 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 	
 	private Scene createScene() {
 		Scene scene = pcfFactory.createScene();
-		scene.setName("main");
+		scene.setName(MAIN_SCENE_NAME);
 		
 		URI nextSceneURI = pcfFactory.createURI();
-		nextSceneURI.setName("next_scene");
-		nextSceneURI.setValue("#../entityDetail");
+		nextSceneURI.setName(NEXT_SCENE_FIELD_NAME);
+		nextSceneURI.setValue(NEXT_ESCENE_FIELD_VALUE);
 		scene.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createURI(nextSceneURI));
 		
 		BooleanVar running = pcfFactory.createBooleanVar();
@@ -388,24 +398,43 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 		File out = new File(directory, pcfFileName);
 		
 		try {
-			JAXBContext context = JAXBContext.newInstance(pcf.getClass().getPackage().getName());
+			JAXBContext context = JAXBContext.newInstance(pcf.getClass());
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			// to specify the URI->prefix mapping, you'll need to provide an
+	        // implementation of NamespaecPrefixMapper, which determines the
+	        // prefixes used for marshalling.
+	        // 
+	        // you specify this as a property of Marshaller to
+	        // tell the marshaller to consult your mapper
+	        // to assign a prefix for a namespace.
+//	        try {
+//	            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",new NamespacePrefixMapperImpl());
+//	        } catch(PropertyException e) {
+//	            // if the JAXB provider doesn't recognize the prefix mapper,
+//	            // it will throw this exception. Since being unable to specify
+//	            // a human friendly prefix is not really a fatal problem,
+//	            // you can just continue marshalling without failing
+//	            logger.error(e);
+//	        }
 			m.marshal(pcf, out);
 		} catch (JAXBException e) {
-			logger.logError("Error exporting to PCF", e);
+			logger.error(e, Messages.ERROR_EXPORTING_PCF);
 			return false;
 		}
 		
 		try {
-			InputStream src = PCFServicesImpl.class.getClassLoader().getResourceAsStream("resources/entityDetail.xml");
+			InputStream src = PCFServicesImpl.class.getClassLoader().getResourceAsStream(ENTITY_DETAIL_TEMPLATE_FILE);
 			File dst = new File(directory, projectName + ENTITY_DETAIL_TEMPLATE + PCF_EXTENSION);
 			FileUtils.copyInputStreamToFile(src, dst);
 		} catch (IOException e) {
-			logger.logError("Error exporting to PCF entity detail template", e);
+			logger.error(e, Messages.ERROR_EXPORTING_DETAIL_TEMPLATE);
 			return false;
 		}
 		
 		return true;
 	}
+	
+	
+	
 }

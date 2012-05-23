@@ -1,5 +1,7 @@
 package edu.eafit.maestria.activa.dao.hibernate;
 
+import java.util.List;
+
 import org.hibernate.Session;
 
 import edu.eafit.maestria.activa.dao.IEntityDao;
@@ -17,5 +19,10 @@ public class EntityDaoImpl extends BaseDaoHibernate<IEntity> implements IEntityD
 	public IEntity newEntity(){
 		IEntity entity = new Entity();
 		return entity;
+	}
+
+	@Override
+	public List<IEntity> getEntities() {
+		return getActiveObjects();
 	}
 }

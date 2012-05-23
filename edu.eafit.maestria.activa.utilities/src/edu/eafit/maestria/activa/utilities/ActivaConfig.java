@@ -5,10 +5,9 @@ import org.apache.commons.configuration.XMLConfiguration;
 
 public final class ActivaConfig
 {
-	private static final LogUtil logger = LogUtil.getInstance(Activator.getDefault().getBundle().getSymbolicName(), ActivaConfig.class);
+	private static final LogUtil logger = LogUtil.getInstance(Activator.getDefault().getBundle().getSymbolicName());
 	
 	private static final String CONFIG_FILE = "conf.xml";
-
 	public static final String DOCUMENTS_BASEDIR = "resources.basedir";
 
 	public static Configuration config;
@@ -35,13 +34,15 @@ public final class ActivaConfig
 		//ClassLoader.getSystemResourceAsStream("conf/jdbc.properties")
 		java.net.URL configURL = ActivaConfig.class.getClassLoader().getResource(CONFIG_FILE);
 		if (configURL == null) {
-			logger.logFatal("Unable to find resource for config file [" + CONFIG_FILE + "]");
+			logger.fatal(Messages.CONFIG_FILE_LOCATION_ERROR, CONFIG_FILE);
+			throw new RuntimeException();
 		}
 		else {
 			try {
 				tempconfig = new XMLConfiguration(configURL);
 			} catch (ConfigurationException e) {
-				logger.logFatal("Unable to Load SMS config file [" + CONFIG_FILE + "]:", e);
+				logger.fatal(e, Messages.CONFIG_FILE_LOADING_ERROR, CONFIG_FILE);
+				throw new RuntimeException();
 			}
 		}
 		config = tempconfig;

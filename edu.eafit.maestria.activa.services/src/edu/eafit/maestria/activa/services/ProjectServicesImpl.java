@@ -19,10 +19,11 @@ import edu.eafit.maestria.activa.model.Scene;
 import edu.eafit.maestria.activa.model.TVAnyTime;
 import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.utilities.Constants;
+import edu.eafit.maestria.activa.utilities.LogUtil;
 
 public class ProjectServicesImpl implements IProjectServices{
 
-	//private final LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName(), ProjectServicesImpl.class);
+	private static final LogUtil logger = LogUtil.getInstance(ModelActivator.getDefault().getBundle().getSymbolicName());
 	
 	private XStream xs;
 	private IEntityServices entityServices;
@@ -36,12 +37,12 @@ public class ProjectServicesImpl implements IProjectServices{
 	
 	public Project loadProject(String name){
 		Project project = new Project();
-		String srcFile = name + System.getProperty("file.separator") + StringUtils.substringAfterLast(name, System.getProperty("file.separator")) + Constants.File.PROJECT_FILE_EXTENSION;
+		String srcFile = name + File.separator + StringUtils.substringAfterLast(name, File.separator) + Constants.File.PROJECT_FILE_EXTENSION;
 		try {
 			FileInputStream fis = new FileInputStream(srcFile);
             xs.fromXML(fis, project);
         } catch (FileNotFoundException e) {
-            //logger.logError(e);
+            logger.error(e);
             return null;
         }
 		
@@ -68,14 +69,14 @@ public class ProjectServicesImpl implements IProjectServices{
         		fs = new FileOutputStream(project.getSource());
 	        	xs.toXML(project, fs);
 	        } catch (FileNotFoundException e) {
-	            //logger.logError(e);
+	            logger.error(e);
 	            return false;
 	        } finally {
 	        	if (fs != null)
 					try {
 						fs.close();
 					} catch (IOException e) {
-						//logger.logWarning(e);
+						logger.warning(e);
 					}
 	        }
 		}

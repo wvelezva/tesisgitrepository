@@ -17,13 +17,4 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowProgressIndicator(true);
     }
     
-    //FIXME aca es donde se debe crear un dialogo modal al salir para preguntarle al usuario en caso de no estar salvado el proyecto
-    public boolean preWindowShellClose() {
-    	return super.preWindowShellClose();
-    }
-    
-//    public void dispose() {
-//    	ActivaPlayer.getInstance().release();
-//    }
-    
 }
