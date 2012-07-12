@@ -8,9 +8,6 @@ public class Messages extends NLS{
 	private static final String BUNDLE_NAME = "edu.eafit.maestria.activa.pcf.messages";
 
 	//PCF
-	public static String PROPERTIES;
-	public static String RESOURCES;
-
 	public static String ERROR_EXPORTING_PCF;
 	public static String ERROR_EXPORTING_DETAIL_TEMPLATE;
 		

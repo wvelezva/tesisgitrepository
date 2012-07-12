@@ -16,7 +16,6 @@ import edu.eafit.maestria.activa.model.Metadata;
 import edu.eafit.maestria.activa.model.ModelActivator;
 import edu.eafit.maestria.activa.model.Project;
 import edu.eafit.maestria.activa.model.Scene;
-import edu.eafit.maestria.activa.model.TVAnyTime;
 import edu.eafit.maestria.activa.model.Video;
 import edu.eafit.maestria.activa.utilities.Constants;
 import edu.eafit.maestria.activa.utilities.LogUtil;
@@ -27,12 +26,14 @@ public class ProjectServicesImpl implements IProjectServices{
 	
 	private XStream xs;
 	private IEntityServices entityServices;
+	private IMetadataServices metadataServices;
 	
-	public ProjectServicesImpl(IEntityServices entityServices){
+	public ProjectServicesImpl(IEntityServices entityServices, IMetadataServices metadataServices){
 		xs = new XStream();
 		xs.processAnnotations(Project.class);
 		xs.setClassLoader(ModelActivator.class.getClassLoader());
 		this.entityServices = entityServices;
+		this.metadataServices = metadataServices;
 	}
 	
 	public Project loadProject(String name){
@@ -45,6 +46,12 @@ public class ProjectServicesImpl implements IProjectServices{
             logger.error(e);
             return null;
         }
+		
+		try {
+			project.getMetadata().setContent(metadataServices.loadMetadata(project.getMetadata().getSource().getAbsolutePath()));
+		} catch (Exception e){
+			logger.warning(e);
+		}
 		
 		return project;
 	}
@@ -79,7 +86,10 @@ public class ProjectServicesImpl implements IProjectServices{
 						logger.warning(e);
 					}
 	        }
+			
 		}
+		//FIXME esto debe estar dentro del anterior if (solo para probar el save de metadata esta aca)
+		metadataServices.saveMetadata(project); 
 		
         
         return true;
@@ -99,10 +109,6 @@ public class ProjectServicesImpl implements IProjectServices{
 			Metadata metadata = new Metadata();
 			metadata.setSource(new File(projectDir, projectName + Constants.File.METADATA_FILE_EXTENSION));
 			project.setMetadata(metadata);
-			
-			TVAnyTime tva = new TVAnyTime();
-			tva.setSource(new File(projectDir, projectName + Constants.File.TVANYTIME_FILE_EXTENSION));
-			project.setTva(tva);
 			
 			Video video = new Video();
 			video.setVideo(sourceVideo);

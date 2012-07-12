@@ -1,9 +1,9 @@
 package edu.eafit.maestria.activa.services;
 
-import edu.eafit.maestria.activa.model.Metadata;
+import edu.eafit.maestria.activa.model.Project;
 
 public interface IMetadataServices {
 
-	public Metadata loadMetadata(String name);
-	public boolean saveMetadata(Metadata metadata);
+	public Object loadMetadata(String name);
+	public boolean saveMetadata(Project project);
 }

@@ -14,6 +14,7 @@ import edu.eafit.maestria.activa.services.ProjectServicesImpl;
 import edu.eafit.maestria.activa.services.PropertyServicesImpl;
 import edu.eafit.maestria.activa.services.ResourceServicesImpl;
 import edu.eafit.maestria.activa.services.TypeServicesImpl;
+import edu.eafit.maestria.activa.tva.TVAnytimeServicesImpl;
 
 public class Container extends DefaultPicoContainer{
 	private static final long serialVersionUID = 5447807520969643660L;
@@ -41,6 +42,7 @@ public class Container extends DefaultPicoContainer{
 			.addComponent(PropertyServicesImpl.class)
 			.addComponent(ResourceServicesImpl.class)
 			.addComponent(TypeServicesImpl.class)
+			.addComponent(TVAnytimeServicesImpl.class)
 			;
 		
 	}

@@ -1,5 +1,7 @@
 package edu.eafit.maestria.activa.model.converters;
 
+import java.io.File;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -20,7 +22,9 @@ public class MetadataToFileConverter extends ObjectToFileConverter {
 	
 	@Override
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext ctx) {
-		return new Metadata();
+		Metadata metadata = new Metadata();
+		metadata.setSource(new File(reader.getValue()));
+		return metadata;
 	}
 
 	@Override

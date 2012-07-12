@@ -7,6 +7,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.tva;bundle-version="0.0.1",
  edu.eafit.maestria.activa.model;bundle-version="0.0.1",
  libs;bundle-version="1.0.0",
  edu.eafit.maestria.activa.container;bundle-version="0.0.1",

@@ -39,7 +39,6 @@ import org.dvb.pcf.pcf.Video;
 import org.dvb.pcf.pcf_types.ComponentType;
 import org.dvb.pcf.pcf_types.ExternalBodyType;
 
-import edu.eafit.maestria.activa.container.Container;
 import edu.eafit.maestria.activa.model.Animation;
 import edu.eafit.maestria.activa.model.IEntity;
 import edu.eafit.maestria.activa.model.Project;
@@ -90,15 +89,13 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 	private static final String PCF_SPEC_VERSION_FIELD_NAME = "pcfSpecVersion";
 	private static final String ENTITY_DETAIL_TEMPLATE = "-entityDetailTemplate";
 	private static final String PCF_EXTENSION = ".pcf.xml";
-	private static final String DIR_NAME ="pcf";
+	private static final String DIR_NAME ="";
 	
 	private ObjectFactory pcfFactory;
-	private org.dvb.pcf.x_dvb_pcf.ObjectFactory xdvbpcfFactory;
 	private IEntityServices entityServices;
 	
 	public PCFServicesImpl(IEntityServices entityServices) {
 		pcfFactory = new ObjectFactory();
-		xdvbpcfFactory = new org.dvb.pcf.x_dvb_pcf.ObjectFactory();
 		this.entityServices = entityServices;
 	}
 
@@ -238,7 +235,7 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 			if (animation.getEntityId() == 0)
 				continue;
 			
-			IEntity entity = ((IEntityServices)Container.get(IEntityServices.class)).getByAnimation(animation);
+			IEntity entity = entityServices.getByAnimation(animation);
 			if (entity == null)
 				continue;
 			
@@ -260,7 +257,7 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 			if (animation.getEntityId() == 0)
 				continue;
 			
-			IEntity entity = ((IEntityServices)Container.get(IEntityServices.class)).getByAnimation(animation);
+			IEntity entity = entityServices.getByAnimation(animation);
 			if (entity == null || addedEntities.containsKey(Long.valueOf(entity.getEntityId())))
 				continue;
 			
@@ -271,7 +268,7 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 			
 			ExternalBodyType body = new ExternalBodyType();
 			body.setContentType(TEXT_XML_MIME_TYPE);
-			body.setUri(project.getTva().getSource().getName());
+			body.setUri(project.getMetadata().getSource().getName());
 			entityRepresentation.setExternalBody(pcfFactory.createExternalBody(body));
 			
 			service.getReferenceOrPrimitiveTypeValueOrConstructedTypeValue().add(pcfFactory.createMarkedUpText(entityRepresentation));		
@@ -401,22 +398,7 @@ public class PCFServicesImpl implements IInteroperableFormatServices {
 			JAXBContext context = JAXBContext.newInstance(pcf.getClass());
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			// to specify the URI->prefix mapping, you'll need to provide an
-	        // implementation of NamespaecPrefixMapper, which determines the
-	        // prefixes used for marshalling.
-	        // 
-	        // you specify this as a property of Marshaller to
-	        // tell the marshaller to consult your mapper
-	        // to assign a prefix for a namespace.
-//	        try {
-//	            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",new NamespacePrefixMapperImpl());
-//	        } catch(PropertyException e) {
-//	            // if the JAXB provider doesn't recognize the prefix mapper,
-//	            // it will throw this exception. Since being unable to specify
-//	            // a human friendly prefix is not really a fatal problem,
-//	            // you can just continue marshalling without failing
-//	            logger.error(e);
-//	        }
+
 			m.marshal(pcf, out);
 		} catch (JAXBException e) {
 			logger.error(e, Messages.ERROR_EXPORTING_PCF);

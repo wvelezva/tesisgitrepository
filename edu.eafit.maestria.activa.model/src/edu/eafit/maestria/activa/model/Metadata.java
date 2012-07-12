@@ -9,10 +9,14 @@ import edu.eafit.maestria.activa.model.converters.Convertable;
 
 @XStreamAlias("metadata")
 public class Metadata implements Convertable{
+	@XStreamOmitField
 	private File source;
 	
 	@XStreamOmitField
 	private boolean modified;
+	
+	@XStreamOmitField
+	private Object content;
 	
 	@Override
 	public File getSource() {
@@ -38,4 +42,13 @@ public class Metadata implements Convertable{
 	public void setModified() {
 		modified=true;		
 	}
+
+	public Object getContent() {
+		return content;
+	}
+
+	public void setContent(Object content) {
+		this.content = content;
+	}
+	
 }

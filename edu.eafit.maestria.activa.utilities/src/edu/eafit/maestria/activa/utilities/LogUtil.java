@@ -135,7 +135,8 @@ public class LogUtil {
     	if (level.getId() <= threshold.getId()) {
     		StackTraceElement el = getLine();
 	    	String location = new Formatter().format("(%s:%d)", el.getFileName(), el.getLineNumber()).toString();
-	        String finalMessage = new Formatter().format("acTiVa: %-40s | %-5s | %s\n", location, level, String.format(message, objs)).toString();
+	    	String newMessage = StringUtils.isBlank(message) ? "" : String.format(message, objs);
+	        String finalMessage = new Formatter().format("acTiVa: %-40s | %-5s | %s\n", location, level, newMessage).toString();
 	        logger.log(new Status(severity, bundleID, code, finalMessage, t));
     	}
     }

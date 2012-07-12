@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.core.runtime,
  edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
  edu.eafit.maestria.activa.dao.hibernate;bundle-version="0.0.1",
  hibernate;bundle-version="1.0.0",
- edu.eafit.maestria.activa.model
+ edu.eafit.maestria.activa.model,
+ edu.eafit.maestria.activa.tva;bundle-version="0.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: edu.eafit.maestria.activa.container

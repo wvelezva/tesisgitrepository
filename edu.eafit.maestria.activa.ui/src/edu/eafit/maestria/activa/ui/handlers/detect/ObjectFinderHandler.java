@@ -23,7 +23,11 @@ public class ObjectFinderHandler extends TrackerHandler {
 
 	@Override
 	public List<Shape> track(Tracker tracker, long currentTime, Shape shape, BufferedImage template, boolean saveImg) {
-		Rectangle rectangle = (Rectangle)shape;
+		Rectangle rectangle = null;
+		if (shape instanceof Rectangle)
+			rectangle = (Rectangle)shape;
+		else
+			rectangle = shape.getBounds();
 		int[] params = fix(rectangle);
 		List<Point> matches = new ObjectFinderExecutor().track(tracker, currentTime, params, template, true);
 		if (matches != null && !matches.isEmpty()) 
@@ -45,6 +49,7 @@ public class ObjectFinderHandler extends TrackerHandler {
 		List<Shape> shapes = new ArrayList<Shape>();
 		for (Point p : matches) {
 			Rectangle r = new Rectangle(activaPlayer.adjustVideoToX(p.x), activaPlayer.adjustVideoToY(p.y), rectangle.width, rectangle.height);
+			
 			shapes.add(r);
 		}
 		return shapes;

@@ -23,11 +23,17 @@ public class TemplateMatchingHandler extends TrackerHandler {
 
 	@Override
 	public List<Shape> track(Tracker tracker, long currentTime, Shape shape, BufferedImage template, boolean saveImg) {
-		Rectangle rectangle = (Rectangle)shape;
+		Rectangle rectangle = null;
+		
+		if (shape instanceof Rectangle)
+			rectangle = (Rectangle)shape;
+		else
+			rectangle = shape.getBounds();
+		
 		int[] params = fix(rectangle);
 		List<Point> matches = new TemplateMatching().track(tracker, currentTime, params, template, false);
 		if (matches != null && !matches.isEmpty()) 
-			return fix(matches, rectangle);
+			return fix(shape, matches, rectangle);
 		
 		return null;
 	}
@@ -41,10 +47,11 @@ public class TemplateMatchingHandler extends TrackerHandler {
 		return fixed;
 	}
 
-	private List<Shape> fix(List<Point> matches, Rectangle rectangle) {
+	private List<Shape> fix(Shape shape, List<Point> matches, Rectangle rectangle) {
 		List<Shape> shapes = new ArrayList<Shape>();
 		for (Point p : matches) {
 			Rectangle r = new Rectangle(activaPlayer.adjustVideoToX(p.x), activaPlayer.adjustVideoToY(p.y), rectangle.width, rectangle.height);
+			shape.getBounds().setLocation(activaPlayer.adjustVideoToX(p.x), activaPlayer.adjustVideoToY(p.y));
 			shapes.add(r);
 		}
 		return shapes;
