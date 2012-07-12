@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TVA
+Bundle-SymbolicName: edu.eafit.maestria.activa.tva
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.eafit.maestria.activa.tva.TVAActivator
+Require-Bundle: org.eclipse.core.runtime,
+ edu.eafit.maestria.activa.utilities;bundle-version="0.0.1",
+ edu.eafit.maestria.activa.model;bundle-version="0.0.1",
+ libs;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: edu.eafit.maestria.activa.tva

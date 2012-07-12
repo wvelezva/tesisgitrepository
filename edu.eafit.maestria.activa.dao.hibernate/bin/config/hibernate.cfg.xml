@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?> 
+<!DOCTYPE hibernate-configuration PUBLIC 
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"> 
+<hibernate-configuration> 
+  <session-factory> 
+    <!-- SQL dialect --> 
+    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property> 
+    <!-- Database connection settings --> 
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+    <property name="connection.url">jdbc:postgresql://localhost/activa</property> 
+    <property name="connection.username">activa</property> 
+    <property name="connection.password">4ct1v4</property> 
+    <!-- JDBC connection pool (use the built-in) --> 
+    <property name="connection.pool_size">1</property> 
+    <!-- Enable Hibernate's automatic session context management --> 
+    <property name="current_session_context_class">thread</property> 
+    <!-- Disable the second-level cache  --> 
+    <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property> 
+    <!-- Echo all executed SQL to stdout --> 
+    <property name="show_sql">true</property> 
+    
+    <!-- es para que siempre actualice la estructura de la bd 
+    <property name="hbm2ddl.auto">update</property>
+    -->
+
+    <mapping class="edu.eafit.maestria.activa.model.Entity"/> 
+    <mapping class="edu.eafit.maestria.activa.model.Property"/> 
+    <mapping class="edu.eafit.maestria.activa.model.Type"/> 
+    <mapping class="edu.eafit.maestria.activa.model.Resource"/> 
+    <mapping class="edu.eafit.maestria.activa.model.TaggedResource"/> 
+    <mapping class="edu.eafit.maestria.activa.model.Show"/> 
+  </session-factory> 
+</hibernate-configuration>

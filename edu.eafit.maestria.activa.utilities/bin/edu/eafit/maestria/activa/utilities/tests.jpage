@@ -1,0 +1,8 @@
+System.out.println("ini");
+Integer key = new Integer(4566);
+float fps = 24.98948f;
+float frameDuration = 1000/fps;
+System.out.println("duration: " + frameDuration);
+double result = Math.ceil(key.floatValue() * frameDuration);
+System.out.println("result: " + result);
+System.out.println(Integer.valueOf(Double.valueOf(result).intValue())); 

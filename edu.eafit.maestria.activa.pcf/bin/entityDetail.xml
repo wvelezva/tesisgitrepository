@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pcf:PCF xmlns:pcf="http://www.dvb.org/pcf/pcf">
+	<pcf:Scene name="entityDetail">
+		<pcf:URI name="next_scene" value="#../main"/>
+		
+		<pcf:SFC>
+			<pcf:MarkedUpText name="content" href="#../../entitySelected"/>
+		</pcf:SFC>
+		
+		<pcf:TextBox name="oktext"> 
+			<pcf:Position name="origin" value="20 370"/> 
+			<pcf:Size name="size" value="100 30"/> 
+			<pcf:String name="content" value="Press OK"/>
+		</pcf:TextBox>
+		<pcf:TextBox name="canceltext"> 
+			<pcf:Position name="origin" value="120 370"/> 
+			<pcf:Size name="size" value="100 30"/> 
+			<pcf:String name="content" value="Press Red"/>
+			<pcf:Color name="textcolor" value="#000000FF" />
+		</pcf:TextBox>
+		
+		<!-- aca se podrian usar los return path, una simple votacion con el componente Indicate
+		o algo mas complejo con transaction pag 157-158 -->
+		<pcf:OnEvent name="press_ok"> 
+			<pcf:Trigger eventtype="KeyEvent"> 
+				<pcf:UserKey name="key" value="VK_ENTER"/>
+			</pcf:Trigger>
+			<pcf:SceneNavigate> 
+				<pcf:URI name="target" value="#../../main"/> 
+			</pcf:SceneNavigate>
+		</pcf:OnEvent>
+
+		<pcf:OnEvent name="exit"> 
+			<pcf:Trigger eventtype="KeyEvent"> 
+				<pcf:UserKey name="key" value="VK_COLORED_KEY_0"/>
+			</pcf:Trigger>
+			<pcf:SceneNavigate> 
+				<pcf:URI name="target" value="#../../main"/> 
+			</pcf:SceneNavigate>
+		</pcf:OnEvent>
+	</pcf:Scene>	
+</pcf:PCF>
